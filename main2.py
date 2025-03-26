@@ -48,6 +48,8 @@ class cavalo(pecaXadrez):
         self.tipo_de_movimento = "UNICO"
 
 class peao(pecaXadrez):
+    passant_direita = False
+    passant_esquerda = False
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
@@ -72,6 +74,7 @@ class espacoVazio:
     aparencia = " "
 espaco_vazio = espacoVazio()
 
+
 #Criando Objetos das peças do tabuleiro
 tabuleiro_principal = [
     [torre(False, "♖"), cavalo(False, "♘"), bispo(False, "♗"), rainha(False, "♕"), rei(False, "♔"), bispo(False, "♗"), cavalo(False, "♘"), torre(False, "♖")],
@@ -89,8 +92,8 @@ tabuleiro_principal = [
 #BRANCAS = TRUE, PRETAS = FALSE
 partida_rolando = True
 jogador_atual = True
-pos_passant1 = 0
-pos_passant2 = 0
+#pos_passant1 = 0
+#pos_passant2 = 0
 
 def imprimirTabuleiro(jogador): 
     impressao = ""
@@ -148,22 +151,22 @@ def introducaoPartida():
     global partida_rolando, jogador_atual
     partida_rolando = True
     jogador_atual = True
-    global pos_passant1, pos_passant2
-    pos_passant1 = 0
-    pos_passant2 = 0
+    #global pos_passant1, pos_passant2
+    #pos_passant1 = 0
+    #pos_passant2 = 0
     turnoAtual(jogador_atual)
 
 def descobrirPeca(posicao1, posicao2):
     return tabuleiro_principal[posicao1][posicao2]
 
 def testarValidezPeca(peca, se_nova_posicao):
-    if peca == " " and se_nova_posicao == False:
+    if peca.aparencia == " " and se_nova_posicao == False:
         return 3
-    elif peca in "♔♕♖♗♘♙" and peca != "" and jogador_atual == True and se_nova_posicao == False:
+    elif peca.aparencia in "♔♕♖♗♘♙" and peca.aparencia != "" and jogador_atual == True and se_nova_posicao == False:
         return 4
-    elif peca in "♚♛♜♝♞♟" and peca != "" and jogador_atual == False and se_nova_posicao == False:
+    elif peca.aparencia in "♚♛♜♝♞♟" and peca.aparencia != "" and jogador_atual == False and se_nova_posicao == False:
         return 4
-    elif se_nova_posicao == True and peca != "•":
+    elif se_nova_posicao == True and peca.aparencia != "•":
         return 5
     else:
         return 0
@@ -174,8 +177,8 @@ def testarValidezCoordenada(entrada, se_nova_posicao, tabuleiro):
     if posicao1 == -1:
         return 2
     else:
-        peca = ""
-        peca = tabuleiro[posicao1][posicao2].aparencia
+        peca = None
+        peca = tabuleiro[posicao1][posicao2]
         return testarValidezPeca(peca, se_nova_posicao)
 
 def imprimirValidezCoordenada(entrada, se_nova_posicao, tabuleiro):
@@ -223,9 +226,8 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
         for c in range(2):
             teste_movimento1 = posicao1 + peca.tipos_movimentos[2+c][0]
             teste_movimento2 = posicao2 + peca.tipos_movimentos[2+c][1]
-            global pos_passant1, pos_passant2
+            #global pos_passant1, pos_passant2
             print("a")
-            print(pos_passant1, pos_passant2)
             print(posicao1, teste_movimento2)
             if str(teste_movimento1) not in "01234567" or str(teste_movimento2) not in "01234567":
                 continue
@@ -235,18 +237,9 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
             elif jogador_atual == False and descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♚♛♜♝♞♟" and tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
                 tabuleiro_movimentos[teste_movimento1][teste_movimento2] = movimento_possivel
                 continue
-            elif jogador_atual == True and pos_passant1 != 0 and pos_passant1 == posicao1 and pos_passant2 == teste_movimento2:
+            elif descobrirPeca(posicao1, posicao2).passant_direita == True and c == 1 or descobrirPeca(posicao1, posicao2).passant_esquerda == True and c == 0:
                 tabuleiro_movimentos[teste_movimento1][teste_movimento2] = movimento_possivel
                 tabuleiro_principal[teste_movimento1][teste_movimento2] = movimento_possivel
-                pos_passant1 = teste_movimento1
-                pos_passant2 = teste_movimento2
-                print("b")
-                continue
-            elif jogador_atual == False and pos_passant1 != 0 and pos_passant1 == posicao1 and pos_passant2 == teste_movimento2:
-                tabuleiro_movimentos[teste_movimento1][teste_movimento2] = movimento_possivel
-                tabuleiro_principal[teste_movimento1][teste_movimento2] = movimento_possivel
-                pos_passant1 = teste_movimento1
-                pos_passant2 = teste_movimento2
                 print("b")
                 continue
 
@@ -269,6 +262,7 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
                     break
                 else:
                     break
+    limparPassantsPossiveis(tabuleiro_principal)
     return tabuleiro_movimentos
 
 def mostrarMovimentosValidos(peca, posicao1, posicao2):
@@ -280,16 +274,24 @@ def mostrarMovimentosValidos(peca, posicao1, posicao2):
     return tabuleiro_movimentos
 
 def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
-    global pos_passant1, pos_passant2
+    #global pos_passant1, pos_passant2
 
     #execução caso en passant seja possivel
-    if n_pos1 - pos1 == 2 and peca.aparencia in "♙♟" or n_pos1 - pos1 == -2 and peca.aparencia in "♙♟":
+    print(descobrirPeca(n_pos1, n_pos2+1).aparencia + "l")
+    print(descobrirPeca(n_pos1, n_pos2-1).aparencia + "l")
+    if n_pos1 - pos1 == 2 and peca.aparencia == "♙" or n_pos1 - pos1 == -2 and peca.aparencia == "♟":
+        if n_pos1 - pos1 == 2 and descobrirPeca(n_pos1, n_pos2-1).aparencia == "♟":
+            descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
+        if n_pos1 - pos1 == 2 and descobrirPeca(n_pos1, n_pos2+1).aparencia == "♟":
+            descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
+        if n_pos1 - pos1 == -2 and descobrirPeca(n_pos1, n_pos2-1).aparencia == "♙":
+            descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
+        if n_pos1 - pos1 == -2 and descobrirPeca(n_pos1, n_pos2+1).aparencia == "♙":
+            descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
         print("en passant?")
-        pos_passant1 = n_pos1
-        pos_passant2 = n_pos2
     
     #execução caso o movimento escolhido seja de fato o en passant
-    if tabuleiro_principal[n_pos1][n_pos2] == "•" and n_pos2 != pos2 and peca.aparencia in "♙♟":
+    if tabuleiro_principal[n_pos1][n_pos2].aparencia == "•" and n_pos2 != pos2 and peca.aparencia in "♙♟":
         if jogador_atual == True:
             tabuleiro_principal[n_pos1+1][n_pos2] = espaco_vazio
         else:
@@ -320,6 +322,13 @@ def limparMovimentosPossiveis(tabuleiro):
             if tabuleiro[linha][coluna] == movimento_possivel:
                 tabuleiro[linha][coluna] = espaco_vazio
 
+def limparPassantsPossiveis(tabuleiro):
+    for linha in range(8):
+        for coluna in range(8):
+            if tabuleiro[linha][coluna].aparencia in "♟♙":
+                tabuleiro[linha][coluna].passant_direita = False
+                tabuleiro[linha][coluna].passant_esquerda = False
+
 def fimDeJogo(razao):
     if razao == "desistencia":
         if jogador_atual == True:
@@ -332,7 +341,7 @@ def fimDeJogo(razao):
             print("=====================================================") 
 
 def turnoAtual(jogador):
-    global jogador_atual, partida_rolando, pos_passant1, pos_passant2
+    global jogador_atual, partida_rolando
     if jogador == True:
         print("- VEZ DAS BRANCAS ♚\n")
     else:
