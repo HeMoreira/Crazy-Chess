@@ -46,6 +46,7 @@ class cavalo(pecaXadrez):
 class peao(pecaXadrez):
     passant_direita = False
     passant_esquerda = False
+    promovido = False
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
@@ -71,7 +72,7 @@ class espacoVazio:
 espaco_vazio = espacoVazio()
 
 #Criando Objetos das peças do tabuleiro
-#"""
+"""
 tabuleiro_principal = [
     [torre(False, "♖"), cavalo(False, "♘"), bispo(False, "♗"), rainha(False, "♕"), rei(False, "♔"), bispo(False, "♗"), cavalo(False, "♘"), torre(False, "♖")],
     [peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙")],
@@ -85,12 +86,12 @@ tabuleiro_principal = [
 """
 tabuleiro_principal = [
     [torre(False, "♖"), espaco_vazio, espaco_vazio, espaco_vazio, rei(False, "♔"), espaco_vazio, espaco_vazio, torre(False, "♖")],
-    [peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙")],
-    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
     [peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟")],
+    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙")],
     [torre(True, "♜"), espaco_vazio, espaco_vazio, espaco_vazio, rei(True, "♚"), espaco_vazio, espaco_vazio, torre(True, "♜")]
 ]
 #"""
@@ -301,6 +302,10 @@ def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
         else:
             tabuleiro_principal[n_pos1-1][n_pos2] = espaco_vazio
 
+    #execução caso o peão movido esteja na linha de promoção
+    if peca.aparencia == "♙" and n_pos1 == 7 or peca.aparencia == "♟" and n_pos1 == 0:
+        peca.promovido = True
+
     #execução caso roque
     elif n_pos2 - pos2 == 2 and peca.aparencia in "♔♚" and peca.se_moveu == False or n_pos2 - pos2 == -2 and peca.aparencia in "♔♚" and peca.se_moveu == False:
         if n_pos2 < 4:
@@ -340,6 +345,43 @@ def fimDeJogo(razao):
             print("=====================================================") 
             print("   FIM DE JOGO..\nAs Pretas desistiram, a vitória é das Brancas!! ♚")
             print("=====================================================") 
+
+def PromoverPeao(peca, pos1, pos2):
+    print("=====================================================")
+    print("                -= PROMOÇÃO DE PEÃO =-               ")
+    print("=====================================================")
+    imprimirTabuleiro(tabuleiro_principal)
+    print("=====================================================")
+    print("Que aventura em.. deseja trocar seu peão por qual peça?")
+    promocao = "aaaaaaaaaaaa"
+    while promocao != "cavalo" and promocao != "bispo" and promocao != "torre" and promocao != "rainha":
+        promocao = input("Resposta: ")
+        promocao = promocao.lower()
+        if promocao == "cavalo":
+            if peca.time == True:
+                tabuleiro_principal[pos1][pos2] = cavalo(True, "♞")
+            else:
+                tabuleiro_principal[pos1][pos2] = cavalo(False, "♘")
+        elif promocao == "torre":
+            if peca.time == True:
+                tabuleiro_principal[pos1][pos2] = torre(True, "♜")
+            else:
+                tabuleiro_principal[pos1][pos2] = torre(False, "♖")
+        elif promocao == "bispo":
+            if peca.time == True:
+                tabuleiro_principal[pos1][pos2] = bispo(True, "♝")
+            else:
+                tabuleiro_principal[pos1][pos2] = bispo(False, "♗")
+        elif promocao == "rainha":
+            if peca.time == True:
+                tabuleiro_principal[pos1][pos2] = rainha(True, "♛")
+            else:
+                tabuleiro_principal[pos1][pos2] = rainha(False, "♕")
+        else:
+            print("Entrada Inválida, certifique-se de escrever o nome correto da peça...")
+    print("=====================================================")
+    print(f"{tabuleiro_principal[pos1][pos2].aparencia} - Seu peão foi promovido para {promocao}!!")
+    print("=====================================================")
 
 def turnoAtual(jogador):
     global jogador_atual, partida_rolando
@@ -414,7 +456,13 @@ def turnoAtual(jogador):
     nova_posicao1, nova_posicao2 = descobrirPosicao(nova_posicao)
     executarMovimento(peca, posicao1, posicao2, nova_posicao1, nova_posicao2)
     limparMovimentosPossiveis(tabuleiro_principal)
-    imprimirTabuleiro(jogador)
+    if peca.aparencia in "♙♟":
+        if peca.promovido == True:
+            PromoverPeao(peca, nova_posicao1, nova_posicao2)
+        else:
+            imprimirTabuleiro(jogador)
+    else:
+        imprimirTabuleiro(jogador)
     
     if jogador == True:
         jogador_atual = False
