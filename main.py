@@ -72,7 +72,7 @@ class espacoVazio:
 espaco_vazio = espacoVazio()
 
 #Criando Objetos das peças do tabuleiro
-"""
+#"""
 tabuleiro_principal = [
     [torre(False, "♖"), cavalo(False, "♘"), bispo(False, "♗"), rainha(False, "♕"), rei(False, "♔"), bispo(False, "♗"), cavalo(False, "♘"), torre(False, "♖")],
     [peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙")],
@@ -95,8 +95,7 @@ tabuleiro_principal = [
     [torre(True, "♜"), espaco_vazio, espaco_vazio, espaco_vazio, rei(True, "♚"), espaco_vazio, espaco_vazio, torre(True, "♜")]
 ]
 #"""
-#lista_pecas = [bispo_preto, bispo_branco, torre_preto, torre_branco, cavalo_preto, cavalo_branco, rainha_preto, rainha_branco, rei_preto, rei_branco, peao_preto, peao_branco]
- 
+
 #BRANCAS = TRUE, PRETAS = FALSE
 partida_rolando = True
 jogador_atual = True
@@ -250,7 +249,6 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
                 elif peca.tipo_de_movimento == "UNICO":
                     possivel_ocupacao_linha = posicao1 + movimento[0]
                     possivel_ocupacao_coluna = posicao2 + movimento[1]
-                print("a")
                 if str(possivel_ocupacao_linha) not in "01234567" or str(possivel_ocupacao_coluna) not in "01234567":
                     break
                 elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] and descobrirPeca(posicao1, 7).aparencia in "♖♜":
@@ -286,14 +284,18 @@ def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
 
     #execução caso en passant seja possivel
     if n_pos1 - pos1 == 2 and peca.aparencia == "♙" or n_pos1 - pos1 == -2 and peca.aparencia == "♟":
-        if n_pos1 - pos1 == 2 and descobrirPeca(n_pos1, n_pos2-1).aparencia == "♟":
-            descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
-        if n_pos1 - pos1 == 2 and descobrirPeca(n_pos1, n_pos2+1).aparencia == "♟":
-            descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
-        if n_pos1 - pos1 == -2 and descobrirPeca(n_pos1, n_pos2-1).aparencia == "♙":
-            descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
-        if n_pos1 - pos1 == -2 and descobrirPeca(n_pos1, n_pos2+1).aparencia == "♙":
-            descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
+        if n_pos1 - pos1 == 2 and n_pos2-1 >= 0:
+            if descobrirPeca(n_pos1, n_pos2-1).aparencia == "♟":
+                descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
+        if n_pos1 - pos1 == 2 and n_pos2+1 < 8:
+            if descobrirPeca(n_pos1, n_pos2+1).aparencia == "♟":
+                descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
+        if n_pos1 - pos1 == -2 and n_pos2-1 >= 0:
+            if descobrirPeca(n_pos1, n_pos2-1).aparencia == "♙":
+                descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
+        if n_pos1 - pos1 == -2 and n_pos2+1 < 8:
+            if descobrirPeca(n_pos1, n_pos2+1).aparencia == "♙":
+                descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
     
     #execução caso o movimento escolhido seja de fato o en passant
     if tabuleiro_principal[n_pos1][n_pos2].aparencia == "•" and n_pos2 != pos2 and peca.aparencia in "♙♟":
@@ -352,7 +354,7 @@ def PromoverPeao(peca, pos1, pos2):
     print("=====================================================")
     imprimirTabuleiro(tabuleiro_principal)
     print("=====================================================")
-    print("Que aventura em.. deseja trocar seu peão por qual peça?")
+    print("Que aventura em.. deseja trocar seu peão por qual peça?\nVocê pode escolher entre 'cavalo', 'torre', 'bispo', e 'rainha'")
     promocao = "aaaaaaaaaaaa"
     while promocao != "cavalo" and promocao != "bispo" and promocao != "torre" and promocao != "rainha":
         promocao = input("Resposta: ")
@@ -472,6 +474,7 @@ def turnoAtual(jogador):
         turnoAtual(jogador_atual)
     else:
         print("A partida acabou...")
+
 introducaoPartida()
 
 """ 
