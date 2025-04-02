@@ -65,6 +65,7 @@ class rei(pecaXadrez):
 
 class movimentoPossivel:
     aparencia = "•"
+    #ofensivo = True
 movimento_possivel = movimentoPossivel()
 
 class espacoVazio:
@@ -206,7 +207,7 @@ def novoTabuleiroVazio():
         tabuleiro[i] = [espaco_vazio]*8
     return tabuleiro
 
-def descobrirMovimentosValidos(peca, posicao1, posicao2):
+def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
     tabuleiro_movimentos = novoTabuleiroVazio()
     if peca.tipo_de_movimento == "PEAO":
 
@@ -229,10 +230,10 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
             teste_movimento2 = posicao2 + peca.tipos_movimentos[2+c][1]
             if str(teste_movimento1) not in "01234567" or str(teste_movimento2) not in "01234567":
                 continue
-            elif jogador_atual == True and descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♔♕♖♗♘♙" and tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
+            elif jogador == True and descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♔♕♖♗♘♙" and tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
                 tabuleiro_movimentos[teste_movimento1][teste_movimento2] = movimento_possivel
                 continue
-            elif jogador_atual == False and descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♚♛♜♝♞♟" and tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
+            elif jogador == False and descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♚♛♜♝♞♟" and tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
                 tabuleiro_movimentos[teste_movimento1][teste_movimento2] = movimento_possivel
                 continue
             elif descobrirPeca(posicao1, posicao2).passant_direita == True and c == 1 or descobrirPeca(posicao1, posicao2).passant_esquerda == True and c == 0:
@@ -264,7 +265,7 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
                 elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia == " ":
                     tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                     tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
-                elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♔♕♖♗♘♙" and descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador_atual == True or descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♚♛♜♝♞♟" and descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador_atual == False:
+                elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♔♕♖♗♘♙" and descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador == True or descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♚♛♜♝♞♟" and descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador == False:
                     tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                     break
                 else:
@@ -272,12 +273,12 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2):
     limparPassantsPossiveis(tabuleiro_principal)
     return tabuleiro_movimentos
 
-def mostrarMovimentosValidos(peca, posicao1, posicao2):
+def mostrarMovimentosValidos(peca, posicao1, posicao2, jogador):
     tabuleiro_movimentos = []
     for c in range(8):
         for i in range(8):
             if peca == tabuleiro_principal[c][i]:
-                tabuleiro_movimentos = descobrirMovimentosValidos(peca, posicao1, posicao2)
+                tabuleiro_movimentos = descobrirMovimentosValidos(peca, posicao1, posicao2, jogador)
     return tabuleiro_movimentos
 
 def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
@@ -385,79 +386,115 @@ def PromoverPeao(peca, pos1, pos2):
     print(f"{tabuleiro_principal[pos1][pos2].aparencia} - Seu peão foi promovido para {promocao}!!")
     print("=====================================================")
 
+def testarCheque():
+    global jogador_atual, partida_rolando, tabuleiro_principal
+    for linha in range(8):
+        for coluna in range(8):
+            peca = descobrirPeca(linha, coluna)
+            if jogador_atual == True and peca.aparencia in "♔♕♖♗♘♙" or jogador_atual == False and peca.aparencia in "♚♛♜♝♞♟":
+                if jogador_atual == True:
+                    tabuleiro_movimentos = descobrirMovimentosValidos(peca, linha, coluna, False)
+                else:
+                    tabuleiro_movimentos = descobrirMovimentosValidos(peca, linha, coluna, True)
+                for linha2 in range(8):
+                    for coluna2 in range(8):
+                        if tabuleiro_movimentos[linha2][coluna2].aparencia == "•":
+                            #print(tabuleiro_principal[linha2][coluna2].aparencia)
+                            if jogador_atual == True and tabuleiro_principal[linha2][coluna2].aparencia == "♚" or jogador_atual == False and tabuleiro_principal[linha2][coluna2].aparencia == "♔":
+                                #print("h")
+                                limparMovimentosPossiveis(tabuleiro_principal)
+                                return True
+    #print("z")
+    limparMovimentosPossiveis(tabuleiro_principal)
+    return False
+
 def turnoAtual(jogador):
-    global jogador_atual, partida_rolando
+    global jogador_atual, partida_rolando, tabuleiro_principal
     if jogador == True:
         print("- VEZ DAS BRANCAS ♚\n")
     else:
         print("- VEZ DAS PRETAS ♔\n")
-
-    peca_escolhida = "aaaaaa"
-    nova_posicao = "aaaaaaaa"
-    se_peca_selecionada = False
-    while se_peca_selecionada == False:
-        imprimirTabuleiro(jogador)
-        entrada_valida = False
-        while entrada_valida == False:
-            peca_escolhida = input("Digite as cordenadas da peça desejada (ex: b2 para selecionar ou b2b4 para selecionar e mover):\nVocê também pode desistir (desistir) se quiser\nResposta: ")
-            if peca_escolhida.lower() == "desistir":
-                partida_rolando = False
-                fimDeJogo("desistencia")
-                return
-            elif len(peca_escolhida) == 2:
-                if testarValidezCoordenada(peca_escolhida, False, tabuleiro_principal) == 0:
-                    entrada_valida = True
-                else:
+    while True:
+        if testarCheque() == True:
+            print("=====================================================") 
+            print("                   -= ! CHEQUE ! =-                  ")
+            print("  Seu rei está sob ameaça, defenda-o imediatamente!  ")
+            print("=====================================================") 
+        peca_escolhida = "aaaaaa"
+        nova_posicao = "aaaaaaaa"
+        se_peca_selecionada = False
+        while se_peca_selecionada == False:
+            imprimirTabuleiro(jogador)
+            entrada_valida = False
+            while entrada_valida == False:
+                peca_escolhida = input("Digite as cordenadas da peça desejada (ex: b2 para selecionar ou b2b4 para selecionar e mover):\nVocê também pode desistir (desistir) se quiser\nResposta: ")
+                if peca_escolhida.lower() == "desistir":
+                    partida_rolando = False
+                    fimDeJogo("desistencia")
+                    return
+                elif len(peca_escolhida) == 2:
+                    if testarValidezCoordenada(peca_escolhida, False, tabuleiro_principal) == 0:
+                        entrada_valida = True
+                    else:
+                        imprimirValidezCoordenada(peca_escolhida, False, tabuleiro_principal)
+                        continue
+                    se_peca_selecionada = True
+                    posicao1, posicao2 = descobrirPosicao(peca_escolhida)
+                    peca = descobrirPeca(posicao1, posicao2)
+                    tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2, jogador_atual)
+                    imprimirTabuleiro(jogador)
+                elif len(peca_escolhida) == 4:
+                    nova_posicao = peca_escolhida[2]+peca_escolhida[3]
+                    peca_escolhida = peca_escolhida[0]+peca_escolhida[1]
+                    if testarValidezCoordenada(peca_escolhida[0]+peca_escolhida[1], False, tabuleiro_principal) == 0:
+                        entrada_valida = True
+                    else:
+                        entrada_valida = False
+                        peca_escolhida = "aaaaaa"
+                        nova_posicao = "aaaaaaaa"
+                        se_peca_selecionada = False
+                        continue
+                    se_peca_selecionada = True
+                    posicao1, posicao2 = descobrirPosicao(peca_escolhida)
+                    peca = descobrirPeca(posicao1, posicao2)
+                    tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2, jogador_atual)
+                    imprimirTabuleiro(jogador)
+                    if testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0:
+                        entrada_valida = False
+                        peca_escolhida = "aaaaaa"
+                        nova_posicao = "aaaaaaaa"
+                        se_peca_selecionada = False
+                        limparMovimentosPossiveis(tabuleiro_principal)
+                        imprimirTabuleiro(jogador_atual)
+                        continue
                     imprimirValidezCoordenada(peca_escolhida, False, tabuleiro_principal)
-                    continue
-                se_peca_selecionada = True
-                posicao1, posicao2 = descobrirPosicao(peca_escolhida)
-                peca = descobrirPeca(posicao1, posicao2)
-                tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2)
-                imprimirTabuleiro(jogador)
-            elif len(peca_escolhida) == 4:
-                nova_posicao = peca_escolhida[2]+peca_escolhida[3]
-                peca_escolhida = peca_escolhida[0]+peca_escolhida[1]
-                if testarValidezCoordenada(peca_escolhida[0]+peca_escolhida[1], False, tabuleiro_principal) == 0:
-                    entrada_valida = True
-                else:
-                    entrada_valida = False
-                    peca_escolhida = "aaaaaa"
-                    nova_posicao = "aaaaaaaa"
+                    imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
+            #print(testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos))
+            while testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0 and se_peca_selecionada == True:
+                nova_posicao = input("Para onde essa peça deve ir? (ex: b4)\nVocê também pode desistir (desistir) ou trocar de peça (trocar)\nResposta: ")
+                if nova_posicao.lower() == "trocar":
                     se_peca_selecionada = False
-                    continue
-                se_peca_selecionada = True
-                posicao1, posicao2 = descobrirPosicao(peca_escolhida)
-                peca = descobrirPeca(posicao1, posicao2)
-                tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2)
-                imprimirTabuleiro(jogador)
-                if testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0:
-                    entrada_valida = False
-                    peca_escolhida = "aaaaaa"
-                    nova_posicao = "aaaaaaaa"
-                    se_peca_selecionada = False
+                    peca_escolhida = "aaaaaaba"
+                    print("trocando a peça...")
                     limparMovimentosPossiveis(tabuleiro_principal)
-                    imprimirTabuleiro(jogador_atual)
-                    continue
-                imprimirValidezCoordenada(peca_escolhida, False, tabuleiro_principal)
+                    break
+                if nova_posicao.lower() == "desistir":
+                    partida_rolando = False
+                    fimDeJogo("desistencia")
+                    return
                 imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
-        #print(testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos))
-        while testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0 and se_peca_selecionada == True:
-            nova_posicao = input("Para onde essa peça deve ir? (ex: b4)\nVocê também pode desistir (desistir) ou trocar de peça (trocar)\nResposta: ")
-            if nova_posicao.lower() == "trocar":
-                se_peca_selecionada = False
-                peca_escolhida = "aaaaaaba"
-                print("trocando a peça...")
-                limparMovimentosPossiveis(tabuleiro_principal)
-                break
-            if nova_posicao.lower() == "desistir":
-                partida_rolando = False
-                fimDeJogo("desistencia")
-                return
-            imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
-    nova_posicao1, nova_posicao2 = descobrirPosicao(nova_posicao)
-    executarMovimento(peca, posicao1, posicao2, nova_posicao1, nova_posicao2)
-    limparMovimentosPossiveis(tabuleiro_principal)
+        limparMovimentosPossiveis(tabuleiro_principal)
+        tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
+        nova_posicao1, nova_posicao2 = descobrirPosicao(nova_posicao)
+        executarMovimento(peca, posicao1, posicao2, nova_posicao1, nova_posicao2)
+        if testarCheque() == False:
+            print("Cheque Evitado")
+            limparMovimentosPossiveis(tabuleiro_principal)
+            break
+        else:
+            tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+            limparMovimentosPossiveis(tabuleiro_principal)
+            print("Você não pode deixar seu rei ser derrotado.. Faça outro movimento!")
     if peca.aparencia in "♙♟":
         if peca.promovido == True:
             PromoverPeao(peca, nova_posicao1, nova_posicao2)
