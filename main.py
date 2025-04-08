@@ -1,3 +1,5 @@
+#233 431
+
 import copy
 numeros_tabuleiro = ["8","7","6","5","4","3","2","1"]
 conversao_coluna = {"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8}
@@ -212,14 +214,14 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
     if peca.tipo_de_movimento == "PEAO":
 
         teste_movimento = posicao1 + peca.tipos_movimentos[0][0]
-        if str(teste_movimento) in "01234567" and tabuleiro_principal[teste_movimento][posicao2].aparencia == " ":
+        if str(teste_movimento) in "01234567" and tabuleiro_principal[teste_movimento][posicao2].aparencia in "• ":
             possivel_ocupacao_linha = posicao1 + peca.tipos_movimentos[0][0]
             possivel_ocupacao_coluna = posicao2 + peca.tipos_movimentos[0][1]
             tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
             tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
 
             teste_movimento = posicao1 + peca.tipos_movimentos[1][0]
-            if str(teste_movimento) in "01234567" and str(posicao1) in "16" and tabuleiro_principal[teste_movimento][posicao2].aparencia == " ":
+            if str(teste_movimento) in "01234567" and str(posicao1) in "16" and tabuleiro_principal[teste_movimento][posicao2].aparencia in "• ":
                 possivel_ocupacao_linha = posicao1 + peca.tipos_movimentos[1][0]
                 possivel_ocupacao_coluna = posicao2 + peca.tipos_movimentos[1][1]
                 tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
@@ -252,17 +254,23 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
                     possivel_ocupacao_coluna = posicao2 + movimento[1]
                 if str(possivel_ocupacao_linha) not in "01234567" or str(possivel_ocupacao_coluna) not in "01234567":
                     break
-                elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] and descobrirPeca(posicao1, 7).aparencia in "♖♜":
+                elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9]:
                     if peca.se_moveu == False and descobrirPeca(posicao1, 7).se_moveu == False and descobrirPeca(posicao1, 6).aparencia in "• " and descobrirPeca(posicao1, 5).aparencia in "• ":
                         tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                         tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
-                        break
+                    if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• ":
+                        tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                        tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                    break
                 elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9] and descobrirPeca(posicao1, 0).aparencia in "♖♜":
+                    #print(peca.se_moveu, descobrirPeca(posicao1, 0).se_moveu)
                     if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• ":
                         tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                         tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                         break
-                elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia == " ":
+                    else:
+                        break
+                elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "• ":
                     tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                     tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                 elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♔♕♖♗♘♙" and descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador == True or descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♚♛♜♝♞♟" and descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador == False:
@@ -270,7 +278,6 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
                     break
                 else:
                     break
-    limparPassantsPossiveis(tabuleiro_principal)
     return tabuleiro_movimentos
 
 def mostrarMovimentosValidos(peca, posicao1, posicao2, jogador):
@@ -282,6 +289,17 @@ def mostrarMovimentosValidos(peca, posicao1, posicao2, jogador):
     return tabuleiro_movimentos
 
 def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
+
+    #execução caso o movimento escolhido seja de fato o en passant
+    #print(tabuleiro_principal[n_pos1][n_pos2].aparencia, n_pos1, n_pos2, pos1, pos2, tabuleiro_principal[pos1][pos2].aparencia)
+    if tabuleiro_principal[n_pos1][n_pos2].aparencia == "•" and n_pos2 != pos2 and peca.aparencia in "♙♟":
+        #print("a")
+        if jogador_atual == True:
+            tabuleiro_principal[n_pos1+1][n_pos2] = espaco_vazio
+        else:
+            tabuleiro_principal[n_pos1-1][n_pos2] = espaco_vazio
+            
+    limparPassantsPossiveis(tabuleiro_principal)
 
     #execução caso en passant seja possivel
     if n_pos1 - pos1 == 2 and peca.aparencia == "♙" or n_pos1 - pos1 == -2 and peca.aparencia == "♟":
@@ -297,13 +315,6 @@ def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
         if n_pos1 - pos1 == -2 and n_pos2+1 < 8:
             if descobrirPeca(n_pos1, n_pos2+1).aparencia == "♙":
                 descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
-    
-    #execução caso o movimento escolhido seja de fato o en passant
-    if tabuleiro_principal[n_pos1][n_pos2].aparencia == "•" and n_pos2 != pos2 and peca.aparencia in "♙♟":
-        if jogador_atual == True:
-            tabuleiro_principal[n_pos1+1][n_pos2] = espaco_vazio
-        else:
-            tabuleiro_principal[n_pos1-1][n_pos2] = espaco_vazio
 
     #execução caso o peão movido esteja na linha de promoção
     if peca.aparencia == "♙" and n_pos1 == 7 or peca.aparencia == "♟" and n_pos1 == 0:
@@ -320,15 +331,14 @@ def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
             
 
     #execução padrão e geral do movimento
-    if peca.se_moveu == False:
-        peca.se_moveu = True
+    peca.se_moveu = True
     tabuleiro_principal[n_pos1][n_pos2] = peca
     tabuleiro_principal[pos1][pos2] = espaco_vazio
 
 def limparMovimentosPossiveis(tabuleiro):
     for linha in range(8):
         for coluna in range(8):
-            if tabuleiro[linha][coluna] == movimento_possivel:
+            if tabuleiro[linha][coluna].aparencia == "•":
                 tabuleiro[linha][coluna] = espaco_vazio
 
 def limparPassantsPossiveis(tabuleiro):
@@ -347,7 +357,16 @@ def fimDeJogo(razao):
         else:
             print("=====================================================") 
             print("   FIM DE JOGO..\nAs Pretas desistiram, a vitória é das Brancas!! ♚")
+            print("=====================================================")
+    if razao == "cheque-mate":
+        if jogador_atual == True:
             print("=====================================================") 
+            print("   FIM DE JOGO..\nO rei Branco foi encurralado, a vitória é das Pretas!! ♔")
+            print("=====================================================") 
+        else:
+            print("=====================================================") 
+            print("   FIM DE JOGO..\nO rei Preto foi encurralado, a vitória é das Brancas!! ♚")
+            print("=====================================================")
 
 def PromoverPeao(peca, pos1, pos2):
     print("=====================================================")
@@ -390,8 +409,10 @@ def testarCheque():
     global jogador_atual, partida_rolando, tabuleiro_principal
     for linha in range(8):
         for coluna in range(8):
+            #print("nova peca")
             peca = descobrirPeca(linha, coluna)
             if jogador_atual == True and peca.aparencia in "♔♕♖♗♘♙" or jogador_atual == False and peca.aparencia in "♚♛♜♝♞♟":
+                #print(f"é uma peça do time inimigo! {peca.aparencia}")
                 if jogador_atual == True:
                     tabuleiro_movimentos = descobrirMovimentosValidos(peca, linha, coluna, False)
                 else:
@@ -399,14 +420,35 @@ def testarCheque():
                 for linha2 in range(8):
                     for coluna2 in range(8):
                         if tabuleiro_movimentos[linha2][coluna2].aparencia == "•":
-                            #print(tabuleiro_principal[linha2][coluna2].aparencia)
+                            #print(f"achei uma!! {linha2}{coluna2}")
                             if jogador_atual == True and tabuleiro_principal[linha2][coluna2].aparencia == "♚" or jogador_atual == False and tabuleiro_principal[linha2][coluna2].aparencia == "♔":
-                                #print("h")
+                                #print("sujo pro teu rei em")
                                 limparMovimentosPossiveis(tabuleiro_principal)
                                 return True
-    #print("z")
     limparMovimentosPossiveis(tabuleiro_principal)
     return False
+
+def testarChequeMate():
+    global jogador_atual, partida_rolando, tabuleiro_principal
+    for linha in range(8):
+        for coluna in range(8):
+            peca = descobrirPeca(linha, coluna)
+            if jogador_atual == False and peca.aparencia in "♔♕♖♗♘♙" or jogador_atual == True and peca.aparencia in "♚♛♜♝♞♟":
+                #print(peca.aparencia)
+                tabuleiro_movimentos = descobrirMovimentosValidos(peca, linha, coluna, jogador_atual)
+                for linha2 in range(8):
+                    for coluna2 in range(8):
+                        if tabuleiro_movimentos[linha2][coluna2].aparencia == "•":
+                            #print("A")
+                            limparMovimentosPossiveis(tabuleiro_principal)
+                            tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
+                            executarMovimento(peca, linha, coluna, linha2, coluna2)
+                            if testarCheque() == True:
+                                tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                            else:
+                                tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                                return False
+    return True
 
 def turnoAtual(jogador):
     global jogador_atual, partida_rolando, tabuleiro_principal
@@ -415,14 +457,26 @@ def turnoAtual(jogador):
     else:
         print("- VEZ DAS PRETAS ♔\n")
     while True:
-        if testarCheque() == True:
+        if testarChequeMate() == True:
+            print("=====================================================") 
+            print("                 -= ! CHEQUE MATE ! =-               ")
+            print("  Seu rei foi encurralado, esse é o fim para você..  ")
+            print("=====================================================")
+            partida_rolando = False
+            fimDeJogo("cheque-mate")
+            return
+        elif testarCheque() == True:
             print("=====================================================") 
             print("                   -= ! CHEQUE ! =-                  ")
             print("  Seu rei está sob ameaça, defenda-o imediatamente!  ")
             print("=====================================================") 
+        
         peca_escolhida = "aaaaaa"
         nova_posicao = "aaaaaaaa"
         se_peca_selecionada = False
+        posicao1 = 0
+        posicao2 = 0
+        peca = None
         while se_peca_selecionada == False:
             imprimirTabuleiro(jogador)
             entrada_valida = False
@@ -483,12 +537,12 @@ def turnoAtual(jogador):
                     fimDeJogo("desistencia")
                     return
                 imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
-        limparMovimentosPossiveis(tabuleiro_principal)
         tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
+        limparMovimentosPossiveis(tabuleiro_suporte)
         nova_posicao1, nova_posicao2 = descobrirPosicao(nova_posicao)
         executarMovimento(peca, posicao1, posicao2, nova_posicao1, nova_posicao2)
         if testarCheque() == False:
-            print("Cheque Evitado")
+            #print("Cheque Evitado")
             limparMovimentosPossiveis(tabuleiro_principal)
             break
         else:
