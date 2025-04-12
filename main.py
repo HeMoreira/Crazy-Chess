@@ -253,10 +253,10 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
                 if str(possivel_ocupacao_linha) not in "01234567" or str(possivel_ocupacao_coluna) not in "01234567":
                     break
                 elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9]:
-                    if peca.se_moveu == False and descobrirPeca(posicao1, 7).se_moveu == False and descobrirPeca(posicao1, 6).aparencia in "• " and descobrirPeca(posicao1, 5).aparencia in "• " and testarCheque() == False:
+                    if peca.se_moveu == False and descobrirPeca(posicao1, 7).se_moveu == False and descobrirPeca(posicao1, 6).aparencia in "• " and descobrirPeca(posicao1, 5).aparencia in "• ":
                         tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                         tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
-                    if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• " and testarCheque() == False:
+                    if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• ":
                         tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                         tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                     break
