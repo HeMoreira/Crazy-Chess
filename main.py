@@ -85,14 +85,14 @@ tabuleiro_principal = [
 ]
 """
 tabuleiro_principal = [
-    [torre(False, "♖"), espaco_vazio, espaco_vazio, espaco_vazio, rei(False, "♔"), espaco_vazio, espaco_vazio, torre(False, "♖")],
-    [peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟")],
+    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, rei(False, "♔"), espaco_vazio, espaco_vazio, espaco_vazio],
+    [peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), espaco_vazio, espaco_vazio, espaco_vazio, peao(True, "♟"), peao(True, "♟")],
+    [espaco_vazio, espaco_vazio, peao(True, "♟"), peao(True, "♟"), espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
     [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
     [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
     [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙")],
-    [torre(True, "♜"), espaco_vazio, espaco_vazio, espaco_vazio, rei(True, "♚"), espaco_vazio, espaco_vazio, torre(True, "♜")]
+    [espaco_vazio, espaco_vazio, espaco_vazio, rei(True, "♚"), espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [torre(True, "♜"), espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, torre(True, "♜")]
 ]
 #"""
 
@@ -253,12 +253,13 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
                 if str(possivel_ocupacao_linha) not in "01234567" or str(possivel_ocupacao_coluna) not in "01234567":
                     break
                 elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9]:
-                    if peca.se_moveu == False and descobrirPeca(posicao1, 7).se_moveu == False and descobrirPeca(posicao1, 6).aparencia in "• " and descobrirPeca(posicao1, 5).aparencia in "• ":
-                        tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
-                        tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
-                    if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• ":
-                        tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
-                        tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                    if peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] and descobrirPeca(posicao1, 7).aparencia in "♖♜" or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9] and descobrirPeca(posicao1, 0).aparencia in "♖♜":
+                        if peca.se_moveu == False and descobrirPeca(posicao1, 7).se_moveu == False and descobrirPeca(posicao1, 7).time == peca.time and descobrirPeca(posicao1, 6).aparencia in "• " and descobrirPeca(posicao1, 5).aparencia in "• ":
+                            tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                            tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                        if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 0).time == peca.time and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• ":
+                            tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                            tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                     break
                 elif descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "• ":
                     tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
@@ -355,6 +356,14 @@ def fimDeJogo(razao):
             print("=====================================================") 
             print("   FIM DE JOGO..\nO rei Preto foi encurralado, a vitória é das Brancas!! ♚")
             print("=====================================================")
+    if razao == "afogamento":
+        print("=====================================================") 
+        print("   FIM DE JOGO..\nUm dos jogadores não pode jogar, o empate é forçado!! #")
+        print("=====================================================")
+    if razao == "empate":
+        print("=====================================================") 
+        print("   FIM DE JOGO..\nQue partida! Os jogadores negociaram um empate!! #")
+        print("=====================================================")
 
 def PromoverPeao(peca, pos1, pos2):
     print("=====================================================")
@@ -414,6 +423,10 @@ def testarCheque():
 
 def testarChequeMate():
     global jogador_atual, partida_rolando, tabuleiro_principal
+    em_cheque = True
+    quant_movimentos_possiveis = 0
+    if testarCheque() == False:
+        em_cheque = False
     for linha in range(8):
         for coluna in range(8):
             peca = descobrirPeca(linha, coluna)
@@ -425,12 +438,28 @@ def testarChequeMate():
                             limparMovimentosPossiveis(tabuleiro_principal)
                             tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
                             executarMovimento(peca, linha, coluna, linha2, coluna2)
+                            if testarCheque() == False and em_cheque == False:
+                                tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                                quant_movimentos_possiveis+=1
+                                print(quant_movimentos_possiveis)
                             if testarCheque() == True:
                                 tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-                            else:
+                            elif testarCheque() == False:
                                 tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-                                return False
-    return True
+                                return "CHEQUE"
+    if quant_movimentos_possiveis == 0 and testarCheque() == False:
+        return "AFOGAMENTO"
+    return "MATE"
+
+def tentativaEmpate():
+    print("=====================================================") 
+    print("             -= ! PROPOSTA DE EMPATE ! =-            ")
+    print("      Seu oponente propôs empate, você aceita?       ")
+    print("=====================================================")
+    resposta = "aaaa"
+    while resposta.lower() != "sim" and resposta.lower() != "nao" and resposta.lower() != "não":
+        resposta = input("Responda 'SIM' ou 'NÃO' conforme a sua resposta\nResposta: ")
+    return resposta.lower()
 
 def turnoAtual(jogador):
     global jogador_atual, partida_rolando, tabuleiro_principal
@@ -439,13 +468,23 @@ def turnoAtual(jogador):
     else:
         print("\n\n\n\n- VEZ DAS PRETAS ♔\n")
     while True:
-        if testarChequeMate() == True:
+        if testarChequeMate() == "MATE":
             print("=====================================================") 
             print("                 -= ! CHEQUE MATE ! =-               ")
             print("  Seu rei foi encurralado, esse é o fim para você..  ")
             print("=====================================================")
+            imprimirTabuleiro(jogador)
             partida_rolando = False
             fimDeJogo("cheque-mate")
+            return
+        elif testarChequeMate() == "AFOGAMENTO":
+            print("=====================================================") 
+            print("                 -= ! AFOGAMENTO ! =-                ")
+            print("  Você não é capaz de passar a vez, empate forçado!  ")
+            print("=====================================================")
+            imprimirTabuleiro(jogador)
+            partida_rolando = False
+            fimDeJogo("afogamento")
             return
         elif testarCheque() == True:
             print("=====================================================") 
@@ -459,94 +498,122 @@ def turnoAtual(jogador):
         posicao1 = 0
         posicao2 = 0
         peca = None
-        while se_peca_selecionada == False:
-            imprimirTabuleiro(jogador)
-            entrada_valida = False
-            while entrada_valida == False:
-                print("==========================================================================================================") 
-                peca_escolhida = input("Digite as cordenadas da peça desejada (ex: b2 para selecionar ou b2b4 para selecionar e mover):\nVocê também pode desistir (desistir) se quiser\nResposta: ")
-                if peca_escolhida.lower() == "desistir":
-                    partida_rolando = False
-                    fimDeJogo("desistencia")
-                    return
-                elif len(peca_escolhida) == 2:
-                    if testarValidezCoordenada(peca_escolhida, False, tabuleiro_principal) == 0:
-                        entrada_valida = True
-                    else:
+        abortar = True
+        while abortar == True:
+            abortar = False
+            while se_peca_selecionada == False:
+                imprimirTabuleiro(jogador)
+                entrada_valida = False
+                while entrada_valida == False:
+                    print("==========================================================================================================") 
+                    peca_escolhida = input("Digite as cordenadas da peça desejada (ex: b2 para selecionar ou b2b4 para selecionar e mover):\nVocê também pode desistir (desistir) ou pedir por empate (empate) se quiser\nResposta: ")
+                    if peca_escolhida.lower() == "desistir":
+                        partida_rolando = False
+                        fimDeJogo("desistencia")
+                        return
+                    if peca_escolhida.lower() == "empate":
+                        resposta = tentativaEmpate()
+                        if resposta == "sim":
+                            partida_rolando = False
+                            fimDeJogo("empate")
+                            return
+                        elif resposta == "nao" or resposta == "não":
+                            print("=====================================================") 
+                            print("            O pedido de EMPATE foi NEGADO!           ")
+                            print("    Alguém está confiante.. a partida continua!!     ")
+                            print("=====================================================")
+                            continue
+                    elif len(peca_escolhida) == 2:
+                        if testarValidezCoordenada(peca_escolhida, False, tabuleiro_principal) == 0:
+                            entrada_valida = True
+                        else:
+                            imprimirValidezCoordenada(peca_escolhida, False, tabuleiro_principal)
+                            continue
+                        se_peca_selecionada = True
+                        posicao1, posicao2 = descobrirPosicao(peca_escolhida)
+                        peca = descobrirPeca(posicao1, posicao2)
+                        tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2, jogador_atual)
+                        imprimirTabuleiro(jogador)
+                    elif len(peca_escolhida) == 4:
+                        nova_posicao = peca_escolhida[2]+peca_escolhida[3]
+                        peca_escolhida = peca_escolhida[0]+peca_escolhida[1]
+                        if testarValidezCoordenada(peca_escolhida[0]+peca_escolhida[1], False, tabuleiro_principal) == 0:
+                            entrada_valida = True
+                        else:
+                            entrada_valida = False
+                            peca_escolhida = "aaaaaa"
+                            nova_posicao = "aaaaaaaa"
+                            se_peca_selecionada = False
+                            continue
+                        se_peca_selecionada = True
+                        posicao1, posicao2 = descobrirPosicao(peca_escolhida)
+                        peca = descobrirPeca(posicao1, posicao2)
+                        tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2, jogador_atual)
+                        imprimirTabuleiro(jogador)
+                        if testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0:
+                            entrada_valida = False
+                            peca_escolhida = "aaaaaa"
+                            nova_posicao = "aaaaaaaa"
+                            se_peca_selecionada = False
+                            limparMovimentosPossiveis(tabuleiro_principal)
+                            imprimirTabuleiro(jogador_atual)
+                            continue
                         imprimirValidezCoordenada(peca_escolhida, False, tabuleiro_principal)
-                        continue
-                    se_peca_selecionada = True
-                    posicao1, posicao2 = descobrirPosicao(peca_escolhida)
-                    peca = descobrirPeca(posicao1, posicao2)
-                    tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2, jogador_atual)
-                    imprimirTabuleiro(jogador)
-                elif len(peca_escolhida) == 4:
-                    nova_posicao = peca_escolhida[2]+peca_escolhida[3]
-                    peca_escolhida = peca_escolhida[0]+peca_escolhida[1]
-                    if testarValidezCoordenada(peca_escolhida[0]+peca_escolhida[1], False, tabuleiro_principal) == 0:
-                        entrada_valida = True
-                    else:
-                        entrada_valida = False
-                        peca_escolhida = "aaaaaa"
-                        nova_posicao = "aaaaaaaa"
+                        imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
+                while testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0 and se_peca_selecionada == True:
+                    print("==========================================================================================================") 
+                    nova_posicao = input("Para onde essa peça deve ir? (ex: b4)\nVocê também pode desistir (desistir) ou trocar de peça (trocar)\nResposta: ")
+                    if nova_posicao.lower() == "trocar":
                         se_peca_selecionada = False
-                        continue
-                    se_peca_selecionada = True
-                    posicao1, posicao2 = descobrirPosicao(peca_escolhida)
-                    peca = descobrirPeca(posicao1, posicao2)
-                    tabuleiro_movimentos = mostrarMovimentosValidos(peca, posicao1, posicao2, jogador_atual)
-                    imprimirTabuleiro(jogador)
-                    if testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0:
-                        entrada_valida = False
-                        peca_escolhida = "aaaaaa"
-                        nova_posicao = "aaaaaaaa"
-                        se_peca_selecionada = False
+                        peca_escolhida = "aaaaaaba"
+                        print("trocando a peça...")
                         limparMovimentosPossiveis(tabuleiro_principal)
-                        imprimirTabuleiro(jogador_atual)
-                        continue
-                    imprimirValidezCoordenada(peca_escolhida, False, tabuleiro_principal)
+                        break
+                    if nova_posicao.lower() == "desistir":
+                        partida_rolando = False
+                        fimDeJogo("desistencia")
+                        return
                     imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
-            while testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0 and se_peca_selecionada == True:
-                print("==========================================================================================================") 
-                nova_posicao = input("Para onde essa peça deve ir? (ex: b4)\nVocê também pode desistir (desistir) ou trocar de peça (trocar)\nResposta: ")
-                if nova_posicao.lower() == "trocar":
-                    se_peca_selecionada = False
-                    peca_escolhida = "aaaaaaba"
-                    print("trocando a peça...")
-                    limparMovimentosPossiveis(tabuleiro_principal)
-                    break
-                if nova_posicao.lower() == "desistir":
-                    partida_rolando = False
-                    fimDeJogo("desistencia")
-                    return
-                imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
-        tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
-        limparMovimentosPossiveis(tabuleiro_suporte)
-        nova_posicao1, nova_posicao2 = descobrirPosicao(nova_posicao)
-        executarMovimento(peca, posicao1, posicao2, nova_posicao1, nova_posicao2)
-        if testarCheque() == False:
-            limparMovimentosPossiveis(tabuleiro_principal)
-            break
-        else:
-            tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-            limparMovimentosPossiveis(tabuleiro_principal)
-            print("Você não pode deixar seu rei ser derrotado.. Faça outro movimento!")
-    if peca.aparencia in "♙♟":
-        if peca.promovido == True:
-            PromoverPeao(peca, nova_posicao1, nova_posicao2)
-        else:
+            tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
+            limparMovimentosPossiveis(tabuleiro_suporte)
+            nova_posicao1, nova_posicao2 = descobrirPosicao(nova_posicao)
+            executarMovimento(peca, posicao1, posicao2, nova_posicao1, nova_posicao2)
+            if testarCheque() == False:
+                limparMovimentosPossiveis(tabuleiro_principal)
+            else:
+                tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                limparMovimentosPossiveis(tabuleiro_principal)
+                print("Você não pode deixar seu rei ser derrotado.. Faça outro movimento!")
+                abortar = True
+                tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                se_peca_selecionada = False
+                peca_escolhida = "aaaaaaba"
+                nova_posicao = "bbbbbbbbab"
+                continue
+                limparMovimentosPossiveis(tabuleiro_principal)
+            if peca.aparencia in "♙♟":
+                if peca.promovido == True:
+                    PromoverPeao(peca, nova_posicao1, nova_posicao2)
             imprimirTabuleiro(jogador)
-    else:
-        imprimirTabuleiro(jogador)
-    
-    if jogador == True:
-        jogador_atual = False
-    else:
-        jogador_atual = True
-    if partida_rolando == True:
-        turnoAtual(jogador_atual)
-    else:
-        print("A partida acabou...")
+            confirmacao = "aaaaa"
+            while confirmacao.lower() != "" and confirmacao.lower() != "cancelar":
+                confirmacao = input("Confirme o movimento pressione enter ou retroceda digitando 'cancelar': ")
+            if confirmacao.lower() == "cancelar":
+                abortar = True
+                tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                se_peca_selecionada = False
+                peca_escolhida = "aaaaaaba"
+                nova_posicao = "bbbbbbbbab"
+                print("Refazendo movimento...")
+                limparMovimentosPossiveis(tabuleiro_principal)
+        if jogador == True:
+            jogador_atual = False
+        else:
+            jogador_atual = True
+        if partida_rolando == True:
+            turnoAtual(jogador_atual)
+        else:
+            print("A partida acabou...")
 
 introducaoPartida()
 
