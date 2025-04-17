@@ -85,14 +85,14 @@ tabuleiro_principal = [
 ]
 """
 tabuleiro_principal = [
-    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, rei(False, "♔"), espaco_vazio, espaco_vazio, espaco_vazio],
-    [peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), espaco_vazio, espaco_vazio, espaco_vazio, peao(True, "♟"), peao(True, "♟")],
-    [espaco_vazio, espaco_vazio, peao(True, "♟"), peao(True, "♟"), espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [torre(False, "♖"), espaco_vazio, espaco_vazio, espaco_vazio, rei(False, "♔"), espaco_vazio, espaco_vazio, torre(False, "♖")],
+    [peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙"), peao(False, "♙")],
     [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
     [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
     [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [espaco_vazio, espaco_vazio, espaco_vazio, rei(True, "♚"), espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
-    [torre(True, "♜"), espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, torre(True, "♜")]
+    [espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio, espaco_vazio],
+    [peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟"), peao(True, "♟")],
+    [torre(True, "♜"), espaco_vazio, espaco_vazio, espaco_vazio, rei(True, "♚"), espaco_vazio, espaco_vazio, torre(True, "♜")]
 ]
 #"""
 
@@ -196,7 +196,11 @@ def imprimirValidezCoordenada(entrada, se_nova_posicao, tabuleiro):
         elif testarValidezCoordenada(entrada, se_nova_posicao, tabuleiro) == 5:
             print("! Coordenada Inválida, esta peça não pode ir para esta posição..")
         elif testarValidezCoordenada(entrada, se_nova_posicao, tabuleiro) == 6:
-            print("! Coordenada Inválida, alguma das informações digitadas não foi aceita..")
+            print("! Coordenada Inválida, alguma das informações digitadas não foram aceitas..")
+        elif testarValidezCoordenada(entrada, se_nova_posicao, tabuleiro) == 7:
+            print("! Coordenada Inválida, você precisa mover a peça para outra posição..")
+        else:
+            print("! Coordenada Inválida, tipo, ta só errado mesmo ¯\_(ヅ)_/¯")
         return 0
     else:
         return 1
@@ -253,10 +257,11 @@ def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
                 if str(possivel_ocupacao_linha) not in "01234567" or str(possivel_ocupacao_coluna) not in "01234567":
                     break
                 elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9]:
-                    if peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] and descobrirPeca(posicao1, 7).aparencia in "♖♜" or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9] and descobrirPeca(posicao1, 0).aparencia in "♖♜":
+                    if peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] and descobrirPeca(posicao1, 7).aparencia in "♖♜":
                         if peca.se_moveu == False and descobrirPeca(posicao1, 7).se_moveu == False and descobrirPeca(posicao1, 7).time == peca.time and descobrirPeca(posicao1, 6).aparencia in "• " and descobrirPeca(posicao1, 5).aparencia in "• ":
                             tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                             tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
+                    if peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9] and descobrirPeca(posicao1, 0).aparencia in "♖♜":
                         if peca.se_moveu == False and descobrirPeca(posicao1, 0).se_moveu == False and descobrirPeca(posicao1, 0).time == peca.time and descobrirPeca(posicao1, 1).aparencia in "• " and descobrirPeca(posicao1, 2).aparencia in "• " and descobrirPeca(posicao1, 3).aparencia in "• ":
                             tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
                             tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = movimento_possivel
@@ -441,7 +446,6 @@ def testarChequeMate():
                             if testarCheque() == False and em_cheque == False:
                                 tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
                                 quant_movimentos_possiveis+=1
-                                print(quant_movimentos_possiveis)
                             if testarCheque() == True:
                                 tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
                             elif testarCheque() == False:
@@ -520,7 +524,7 @@ def turnoAtual(jogador):
                         elif resposta == "nao" or resposta == "não":
                             print("=====================================================") 
                             print("            O pedido de EMPATE foi NEGADO!           ")
-                            print("    Alguém está confiante.. a partida continua!!     ")
+                            print("   Alguém está confiante.. e a partida continua!!    ")
                             print("=====================================================")
                             continue
                     elif len(peca_escolhida) == 2:
@@ -562,17 +566,13 @@ def turnoAtual(jogador):
                         imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
                 while testarValidezCoordenada(nova_posicao, True, tabuleiro_movimentos) != 0 and se_peca_selecionada == True:
                     print("==========================================================================================================") 
-                    nova_posicao = input("Para onde essa peça deve ir? (ex: b4)\nVocê também pode desistir (desistir) ou trocar de peça (trocar)\nResposta: ")
+                    nova_posicao = input("Para onde essa peça deve ir? (ex: b4)\nVocê também pode trocar de peça (trocar)\nResposta: ")
                     if nova_posicao.lower() == "trocar":
                         se_peca_selecionada = False
                         peca_escolhida = "aaaaaaba"
                         print("trocando a peça...")
                         limparMovimentosPossiveis(tabuleiro_principal)
                         break
-                    if nova_posicao.lower() == "desistir":
-                        partida_rolando = False
-                        fimDeJogo("desistencia")
-                        return
                     imprimirValidezCoordenada(nova_posicao, True, tabuleiro_movimentos)
             tabuleiro_suporte = copy.deepcopy(tabuleiro_principal)
             limparMovimentosPossiveis(tabuleiro_suporte)
@@ -606,14 +606,16 @@ def turnoAtual(jogador):
                 nova_posicao = "bbbbbbbbab"
                 print("Refazendo movimento...")
                 limparMovimentosPossiveis(tabuleiro_principal)
-        if jogador == True:
-            jogador_atual = False
-        else:
-            jogador_atual = True
-        if partida_rolando == True:
-            turnoAtual(jogador_atual)
-        else:
-            print("A partida acabou...")
+        break
+    if jogador == True:
+        jogador_atual = False
+    else:
+        jogador_atual = True
+    if partida_rolando == True:
+        turnoAtual(jogador_atual)
+    else:
+        print("A partida acabou...")
+        return
 
 introducaoPartida()
 
