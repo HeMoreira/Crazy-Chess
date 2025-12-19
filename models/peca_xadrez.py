@@ -1,9 +1,11 @@
+from models.enums_utilitarios import TipoDeMovimento
+
 class pecaXadrez:
     aparencia = ""
-    tipos_movimentos = []
+    tipos_movimentos = ()
     time = True
     se_moveu = False
-    tipo_de_movimento = "" #| UNICO | INFINITO | PEAO |
+    tipo_de_movimento = TipoDeMovimento.INFINITO
     def __init__(self, tipos_movimentos:list, time:bool, aparencia:str, tipo_de_movimento:str):
         self.aparencia = aparencia
         self.tipos_movimentos = tipos_movimentos
@@ -14,29 +16,29 @@ class bispo(pecaXadrez):
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
-        self.tipos_movimentos = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
-        self.tipo_de_movimento = "INFINITO"
+        self.tipos_movimentos = ((-1, -1), (1, 1), (1, -1), (1, 1))
+        self.tipo_de_movimento = TipoDeMovimento.INFINITO
 
 class torre(pecaXadrez):
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
-        self.tipos_movimentos = [[-1, 0], [1, 0], [0, -1], [0, 1]]
-        self.tipo_de_movimento = "INFINITO"
+        self.tipos_movimentos = ((-1, 0), (1, 0), (0, -1), (0, 1))
+        self.tipo_de_movimento = TipoDeMovimento.INFINITO
 
 class rainha(pecaXadrez):
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
-        self.tipos_movimentos = [[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]
-        self.tipo_de_movimento = "INFINITO"
+        self.tipos_movimentos = ((-1, -1), (-1, 1), (1, -1), (1, 1), (-1, 0), (1, 0), (0, -1), (0, 1))
+        self.tipo_de_movimento = TipoDeMovimento.INFINITO
 
 class cavalo(pecaXadrez):
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
-        self.tipos_movimentos = [[2, -1], [2, 1], [-2, -1], [-2, 1], [-1, 2], [1, 2], [-1, -2], [1, -2]]
-        self.tipo_de_movimento = "UNICO"
+        self.tipos_movimentos = ((2, -1), (2, 1), (-2, -1), (-2, 1), (-1, 2), (1, 2), (-1, -2), (1, -2))
+        self.tipo_de_movimento = TipoDeMovimento.UNICO
 
 class peao(pecaXadrez):
     passant_direita = False
@@ -46,14 +48,14 @@ class peao(pecaXadrez):
         self.time = time
         self.aparencia = aparencia
         if time == False:
-            self.tipos_movimentos = [[1, 0], [2, 0], [1, -1], [1, 1]]
+            self.tipos_movimentos = ((1, 0), (2, 0), (1, -1), (1, 1))
         else:
-            self.tipos_movimentos = [[-1, 0], [-2, 0], [-1, -1], [-1, 1]]
-        self.tipo_de_movimento = "PEAO"
+            self.tipos_movimentos = ((-1, 0), (-2, 0), (-1, -1), (-1, 1))
+        self.tipo_de_movimento = TipoDeMovimento.PEAO
 
 class rei(pecaXadrez):
     def __init__(self, time:bool, aparencia:str):
         self.time = time
         self.aparencia = aparencia
-        self.tipos_movimentos = [[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1], [0, 2], [0, -2]]
-        self.tipo_de_movimento = "UNICO"
+        self.tipos_movimentos = ((-1, -1), (-1, 1), (1, -1), (1, 1), (-1, 0), (1, 0), (0, -1), (0, 1), (0, 2), (0, -2))
+        self.tipo_de_movimento = TipoDeMovimento.UNICO

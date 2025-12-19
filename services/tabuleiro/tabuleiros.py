@@ -1,40 +1,46 @@
 import copy
 from settings import settings
+from models.enums_utilitarios import Jogador
 
-def imprimirTabuleiro(jogador): 
-    impressao = ""
-    tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
-    numeros_tabuleiro_suporte = settings.numeros_tabuleiro
-    # Inversão dinâmica do tabuleiro conforme o jogador atual varia...
-    """
-    if jogador == False:
-        ajudante = 7
-        numeros_tabuleiro_suporte = ["","","","","","","",""] 
-        for linha in range(len(tabuleiro_suporte)):
-            tabuleiro_suporte[linha] = settings.tabuleiro_principal[ajudante]
-            numeros_tabuleiro_suporte[linha] = numeros_tabuleiro[ajudante]
-            ajudante-=1
-    """
-        
-    print("   _______________________") 
+def imprimirTabuleiro(): 
+    tabuleiro_impressao = copy.deepcopy(settings.tabuleiro_principal)
+    numeros_tabuleiro = settings.numeros_tabuleiro
+
+    if settings.inversao_dinamica_esta_habilitada and settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS.value:
+        tabuleiro_impressao, numeros_tabuleiro = inverterOTabuleiroSeJogadorDePretas(tabuleiro_impressao)
+    
+    imprimirCampo(tabuleiro_impressao, numeros_tabuleiro)
+
+def imprimirCampo(tabuleiro_impressao:list, numeros_tabuleiro:list[str]):
+    impressao_final = ""
+    print("   _______________________")
     linha_atual = 0 
-    impressao = impressao + f"{numeros_tabuleiro_suporte[linha_atual]}" 
+    impressao_final = impressao_final + f"{numeros_tabuleiro[linha_atual]}" 
     linha_atual+=1 
-    for linha in range(len(tabuleiro_suporte)):
+    for linha in range(len(tabuleiro_impressao)):
         for coluna in range(8):
-            impressao = impressao + " |" + tabuleiro_suporte[linha][coluna].aparencia
+            impressao_final = impressao_final + " |" + tabuleiro_impressao[linha][coluna].aparencia
             if (coluna+1) % 8 == 0 and linha+1 != 8:
-                impressao = impressao + " |\n" 
-                impressao = impressao + f"{numeros_tabuleiro_suporte[linha_atual]}" 
+                impressao_final = impressao_final + " |\n" 
+                impressao_final = impressao_final + f"{numeros_tabuleiro[linha_atual]}" 
                 linha_atual+=1 
             elif (coluna+1) % 8 == 0:
-                impressao = impressao + " |" 
-    print(impressao) 
+                impressao_final = impressao_final + " |" 
+    print(impressao_final) 
     print("   ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯") 
     print("    a  b  c  d  e  f  g  h")
 
-def novoTabuleiroVazio():
+
+def criarNovoTabuleiroVazio():
     tabuleiro = [[],[],[],[],[],[],[],[]]
     for i in range(8):
         tabuleiro[i] = [settings.espaco_vazio]*8
     return tabuleiro
+
+def inverterOTabuleiroSeJogadorDePretas(tabuleiro_impressao:list):
+    linha_contraria = 7
+    numeros_tabuleiro_invertidos = settings.numeros_tabuleiro[::-1]
+    for linha in range(len(tabuleiro_impressao)):
+        tabuleiro_impressao[linha] = settings.tabuleiro_principal[linha_contraria]
+        linha_contraria-=1
+    return tabuleiro_impressao, numeros_tabuleiro_invertidos
