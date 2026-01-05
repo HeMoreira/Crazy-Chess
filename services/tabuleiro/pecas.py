@@ -1,54 +1,47 @@
 from settings import settings
 from services.tabuleiro import tabuleiros
+from models.peca_xadrez import PecaXadrez
+from models.cords import Cordenadas
+from services.utilitarios import impressoes
 
-def descobrirPeca(posicao1, posicao2):
-    return settings.tabuleiro_principal[posicao1][posicao2]
+def descobrirPeca(cordenadas:Cordenadas):
+    return settings.tabuleiro_principal[cordenadas.indice_linha][cordenadas.indice_coluna]
 
-def testarValidezPeca(peca, se_nova_posicao):
-    if peca.aparencia == " " and se_nova_posicao == False:
-        return 3
-    elif peca.aparencia in "♔♕♖♗♘♙" and peca.aparencia != "" and settings.jogador_atual == True and se_nova_posicao == False:
-        return 4
-    elif peca.aparencia in "♚♛♜♝♞♟" and peca.aparencia != "" and settings.jogador_atual == False and se_nova_posicao == False:
-        return 4
-    elif se_nova_posicao == True and peca.aparencia != "•":
-        return 5
-    else:
-        return 0
+def atualizarPosicaoPeca(cordenadas:Cordenadas):
+    peca = settings.tabuleiro_principal[cordenadas.indice_linha][cordenadas.indice_coluna]
     
-def PromoverPeao(peca, pos1, pos2):
-    print("=====================================================")
-    print("                -= PROMOÇÃO DE PEÃO =-               ")
-    print("=====================================================")
+    if peca.aparencia in settings.pecas_jogador_de_brancas or peca.aparencia in settings.pecas_jogador_de_pretas:
+        peca.indice_linha_atual = cordenadas.indice_linha
+        peca.indice_coluna_atual = cordenadas.indice_coluna
+    
+def promoverPeao(peca:PecaXadrez):
+    impressoes.imprimirCabecalho("PROMOÇÃO DE PEÃO")
     tabuleiros.imprimirTabuleiro(settings.tabuleiro_principal)
-    print("=====================================================")
+    impressoes.imprimirDivisoria()
     print("Que aventura em.. deseja trocar seu peão por qual peça?\nVocê pode escolher entre 'cavalo', 'torre', 'bispo', e 'rainha'")
-    promocao = "aaaaaaaaaaaa"
-    while promocao != "cavalo" and promocao != "bispo" and promocao != "torre" and promocao != "rainha":
-        promocao = input("Resposta: ")
-        promocao = promocao.lower()
-        if promocao == "cavalo":
-            if peca.time == True:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.cavalo(True, "♞")
-            else:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.cavalo(False, "♘")
-        elif promocao == "torre":
-            if peca.time == True:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.torre(True, "♜")
-            else:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.torre(False, "♖")
-        elif promocao == "bispo":
-            if peca.time == True:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.bispo(True, "♝")
-            else:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.bispo(False, "♗")
-        elif promocao == "rainha":
-            if peca.time == True:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.rainha(True, "♛")
-            else:
-                settings.tabuleiro_principal[pos1][pos2] = settings.peca.rainha(False, "♕")
-        else:
+    
+    peca = selecionarPromocaoDoPeao(peca)
+
+    impressoes.imprimirDivisoria()
+    print(f"{peca.aparencia} - Seu peão foi promovido!!")
+    impressoes.imprimirDivisoria()
+
+def selecionarPromocaoDoPeao(peca:PecaXadrez):
+    promocao = "entrada inválida"
+    while promocao.lower() not in ["cavalo", "torre", "bispo", "rainha"]:
+        promocao = input("Resposta: ").lower()
+        if promocao.lower() not in ["cavalo", "torre", "bispo", "rainha"]:
             print("! Entrada Inválida, certifique-se de escrever o nome correto da peça...")
-    print("=====================================================")
-    print(f"{settings.tabuleiro_principal[pos1][pos2].aparencia} - Seu peão foi promovido para {promocao}!!")
-    print("=====================================================")
+
+    return promoverPeaoPara(peca, promocao)
+
+def promoverPeaoPara(peao:PecaXadrez, nova_peca:str):
+    if nova_peca == "cavalo":
+        settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Cavalo(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca])
+    elif nova_peca == "torre":
+        settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Torre(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca])
+    elif nova_peca == "bispo":
+        settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Bispo(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca])
+    elif nova_peca == "rainha":
+        settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Rainha(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca])
+    return settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual]

@@ -8,10 +8,16 @@ def introduzirPartida():
     settings.jogador_atual = True
     # turno_atual.turnoAtual(settings.jogador_atual)
 
+def imprimirCabecalho(titulo:str):
+    imprimirDivisoria()
+    imprimirTituloCabecalho(titulo)
+    imprimirDivisoria()
+    print("\n")
+
 def imprimirDivisoria():
     print("="*53)
 
-def imprimirTitulo(titulo:str):
+def imprimirTituloCabecalho(titulo:str):
     novo_titulo = ""
     if len(titulo) <= 47:
         novo_titulo = adicionarEspacosNoTitulo(titulo)
@@ -31,8 +37,7 @@ def adicionarEspacosNoTitulo(titulo:str):
         adicionar_a_esquerda = not adicionar_a_esquerda
     return novo_titulo
 
-def imprimirCabecalho(titulo:str):
-    imprimirDivisoria()
-    imprimirTitulo(titulo)
-    imprimirDivisoria()
-    print("\n")
+def imprimirTituloIsolado(titulo:str):
+    print(f"\n\n\n{titulo}\n")
+
+
