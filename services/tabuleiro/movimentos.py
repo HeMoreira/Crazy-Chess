@@ -1,123 +1,191 @@
 from settings import settings
 from services.tabuleiro import tabuleiros, pecas
+from models.cords import Cordenadas
+from models.enums_utilitarios import TipoDeMovimento, Jogador
+from models.peca_xadrez import PecaXadrez
 
-def descobrirMovimentosValidos(peca, posicao1, posicao2, jogador):
-    tabuleiro_movimentos = tabuleiros.novoTabuleiroVazio()
-    if peca.tipo_de_movimento == "PEAO":
-
-        teste_movimento = posicao1 + peca.tipos_movimentos[0][0]
-        if str(teste_movimento) in "01234567" and settings.tabuleiro_principal[teste_movimento][posicao2].aparencia in "• ":
-            possivel_ocupacao_linha = posicao1 + peca.tipos_movimentos[0][0]
-            possivel_ocupacao_coluna = posicao2 + peca.tipos_movimentos[0][1]
-            settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-            tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-
-            teste_movimento = posicao1 + peca.tipos_movimentos[1][0]
-            if str(teste_movimento) in "01234567" and str(posicao1) in "16" and settings.tabuleiro_principal[teste_movimento][posicao2].aparencia in "• ":
-                possivel_ocupacao_linha = posicao1 + peca.tipos_movimentos[1][0]
-                possivel_ocupacao_coluna = posicao2 + peca.tipos_movimentos[1][1]
-                settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-
-        for c in range(2):
-            teste_movimento1 = posicao1 + peca.tipos_movimentos[2+c][0]
-            teste_movimento2 = posicao2 + peca.tipos_movimentos[2+c][1]
-            if str(teste_movimento1) not in "01234567" or str(teste_movimento2) not in "01234567":
-                continue
-            elif jogador == True and pecas.descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♔♕♖♗♘♙" and settings.tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
-                tabuleiro_movimentos[teste_movimento1][teste_movimento2] = settings.movimento_possivel
-                continue
-            elif jogador == False and pecas.descobrirPeca(teste_movimento1, teste_movimento2).aparencia in "♚♛♜♝♞♟" and settings.tabuleiro_principal[teste_movimento1][teste_movimento2].aparencia != "":
-                tabuleiro_movimentos[teste_movimento1][teste_movimento2] = settings.movimento_possivel
-                continue
-            elif pecas.descobrirPeca(posicao1, posicao2).passant_direita == True and c == 1 or pecas.descobrirPeca(posicao1, posicao2).passant_esquerda == True and c == 0:
-                tabuleiro_movimentos[teste_movimento1][teste_movimento2] = settings.movimento_possivel
-                settings.tabuleiro_principal[teste_movimento1][teste_movimento2] = settings.movimento_possivel
-                continue
-
-    else:
-        for movimento in peca.tipos_movimentos:
-            for multiplicador in range(10):
-                if peca.tipo_de_movimento == "INFINITO":
-                    possivel_ocupacao_linha = posicao1 + movimento[0]*(multiplicador+1)
-                    possivel_ocupacao_coluna = posicao2 + movimento[1]*(multiplicador+1)
-                elif peca.tipo_de_movimento == "UNICO":
-                    possivel_ocupacao_linha = posicao1 + movimento[0]
-                    possivel_ocupacao_coluna = posicao2 + movimento[1]
-                if str(possivel_ocupacao_linha) not in "01234567" or str(possivel_ocupacao_coluna) not in "01234567":
-                    break
-                elif peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] or peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9]:
-                    if peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[8] and pecas.descobrirPeca(posicao1, 7).aparencia in "♖♜":
-                        if peca.se_moveu == False and pecas.descobrirPeca(posicao1, 7).se_moveu == False and pecas.descobrirPeca(posicao1, 7).time == peca.time and pecas.descobrirPeca(posicao1, 6).aparencia in "• " and pecas.descobrirPeca(posicao1, 5).aparencia in "• ":
-                            settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                            tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                    if peca.aparencia in "♔♚" and movimento == peca.tipos_movimentos[9] and pecas.descobrirPeca(posicao1, 0).aparencia in "♖♜":
-                        if peca.se_moveu == False and pecas.descobrirPeca(posicao1, 0).se_moveu == False and pecas.descobrirPeca(posicao1, 0).time == peca.time and pecas.descobrirPeca(posicao1, 1).aparencia in "• " and pecas.descobrirPeca(posicao1, 2).aparencia in "• " and pecas.descobrirPeca(posicao1, 3).aparencia in "• ":
-                            settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                            tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                    break
-                elif pecas.descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "• ":
-                    settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                    tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                elif pecas.descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♔♕♖♗♘♙" and pecas.descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador == True or pecas.descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia in "♚♛♜♝♞♟" and pecas.descobrirPeca(possivel_ocupacao_linha, possivel_ocupacao_coluna).aparencia != "" and jogador == False:
-                    tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
-                    break
-                else:
-                    break
+def descobrirMovimentosValidos(peca:PecaXadrez):
+    tabuleiro_movimentos = tabuleiros.criarNovoTabuleiroVazio()
+    if peca.tipo_de_movimento == TipoDeMovimento.PEAO.value:
+        descobrirMovimentosValidosParaPecaTipoPeao(peca, tabuleiro_movimentos)
+    elif peca.tipo_de_movimento == TipoDeMovimento.INFINITO.value:
+        descobrirMovimentosValidosParaPecaTipoInfinito(peca, tabuleiro_movimentos)
+    elif peca.tipo_de_movimento == TipoDeMovimento.UNICO.value:
+        descobrirMovimentosValidosParaPecaTipoUnico(peca, tabuleiro_movimentos)
     return tabuleiro_movimentos
 
-def mostrarMovimentosValidos(peca, posicao1, posicao2, jogador):
-    tabuleiro_movimentos = []
-    for c in range(8):
-        for i in range(8):
-            if peca == settings.tabuleiro_principal[c][i]:
-                tabuleiro_movimentos = descobrirMovimentosValidos(peca, posicao1, posicao2, jogador)
-    return tabuleiro_movimentos
+def descobrirMovimentosValidosParaPecaTipoUnico(peca:PecaXadrez, tabuleiro_movimentos:list):
+    for movimento in peca.tipos_movimentos:
+        possivel_ocupacao_linha = peca.indice_linha_atual + movimento[0]
+        possivel_ocupacao_coluna = peca.indice_coluna_atual + movimento[1]
+        possivel_ocupacao = Cordenadas(possivel_ocupacao_linha, possivel_ocupacao_coluna)
+        
+        if testarSePossivelOcupacaoEhValida(possivel_ocupacao) == False:
+            continue
 
-def executarMovimento(peca, pos1, pos2, n_pos1, n_pos2):
+        if verificarSeRoqueEhUmaOpcaoValida(peca, movimento, tabuleiro_movimentos) == True:
+            continue
+        elif verificarSeNovaPosicaoEstaLivre(possivel_ocupacao, tabuleiro_movimentos) == True:
+            continue
+        verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao, tabuleiro_movimentos)
+        # se não for, certamente é uma peça do seu time, dispensando qualquer ação
 
-    #execução caso o movimento escolhido seja de fato o en passant
-    if settings.tabuleiro_principal[n_pos1][n_pos2].aparencia == "•" and n_pos2 != pos2 and peca.aparencia in "♙♟":
-        if settings.jogador_atual == True:
-            settings.tabuleiro_principal[n_pos1+1][n_pos2] = settings.espaco_vazio
-        else:
-            settings.tabuleiro_principal[n_pos1-1][n_pos2] = settings.espaco_vazio
-            
+def descobrirMovimentosValidosParaPecaTipoInfinito(peca:PecaXadrez, tabuleiro_movimentos:list):
+    for movimento in peca.tipos_movimentos:
+        for multiplicador in range(10):
+            possivel_ocupacao_linha = peca.indice_linha_atual + movimento[0]*(multiplicador+1)
+            possivel_ocupacao_coluna = peca.indice_coluna_atual + movimento[1]*(multiplicador+1)
+            possivel_ocupacao = Cordenadas(possivel_ocupacao_linha, possivel_ocupacao_coluna)
+        
+            if testarSePossivelOcupacaoEhValida(possivel_ocupacao) == False:
+                continue
+
+            if verificarSeNovaPosicaoEstaLivre(possivel_ocupacao, tabuleiro_movimentos) == True:
+                continue
+            elif verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao, tabuleiro_movimentos) == True:
+                break
+            # se não for, certamente é uma peça do seu time, dispensando qualquer ação
+
+def descobrirMovimentosValidosParaPecaTipoPeao(peca:PecaXadrez, tabuleiro_movimentos:list):
+    if verificarSePeaoPodeAvancarUmaCasa(peca, tabuleiro_movimentos) == True:
+        verificarSePeaoPodeAvancarDuasCasas(peca, tabuleiro_movimentos)
+
+    for c in range(2):
+        # representa os movimentos para tomar peças inimigas na diagonal. na segunda execução, troca para a segunda diagonal
+        possivel_ocupacao_linha = peca.indice_linha_atual + peca.tipos_movimentos[2+c][0]
+        possivel_ocupacao_coluna = peca.indice_coluna_atual + peca.tipos_movimentos[2+c][1]
+        possivel_ocupacao = [possivel_ocupacao_linha, possivel_ocupacao_coluna]
+
+        if verificarSePeaoPodeAvançarEmDiagonal(possivel_ocupacao) == True:
+            verificarSePeaoPodeCapturarEmDiagonal(possivel_ocupacao, tabuleiro_movimentos)
+        verificarSePeaoPodeCapturarEnPassant(peca, c, possivel_ocupacao, tabuleiro_movimentos)
+
+def testarSePossivelOcupacaoEhValida(possivel_ocupacao:Cordenadas):
+    if str(possivel_ocupacao.indice_linha) in settings.indices_tabuleiro and str(possivel_ocupacao.indice_coluna) in settings.indices_tabuleiro:
+        return True
+    return False
+
+def verificarSePeaoPodeCapturarEnPassant(peca:PecaXadrez, c:int, possivel_ocupacao:list, tabuleiro_movimentos:list):
+    if peca.passant_direita == True and c == 1 or peca.passant_esquerda == True and c == 0:
+        tabuleiro_movimentos[possivel_ocupacao[0]][possivel_ocupacao[1]] = settings.movimento_possivel
+        settings.tabuleiro_principal[possivel_ocupacao[0]][possivel_ocupacao[1]] = settings.movimento_possivel
+
+def verificarSePeaoPodeCapturarEmDiagonal(possivel_ocupacao:list, tabuleiro_movimentos:list):
+    peca_na_possivel_ocupacao = pecas.descobrirPeca(possivel_ocupacao[0], possivel_ocupacao[1])
+    if settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS and peca_na_possivel_ocupacao.aparencia in settings.pecas_jogador_de_pretas and settings.tabuleiro_principal[possivel_ocupacao[0]][possivel_ocupacao[1]].aparencia != "":
+        tabuleiro_movimentos[possivel_ocupacao[0]][possivel_ocupacao[1]] = settings.movimento_possivel
+    elif settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS and peca_na_possivel_ocupacao.aparencia in settings.pecas_jogador_de_brancas and settings.tabuleiro_principal[possivel_ocupacao[0]][possivel_ocupacao[1]].aparencia != "":
+        tabuleiro_movimentos[possivel_ocupacao[0]][possivel_ocupacao[1]] = settings.movimento_possivel
+
+def verificarSePeaoPodeAvançarEmDiagonal(possivel_ocupacao:list):
+    if str(possivel_ocupacao[0]) in settings.indices_tabuleiro and str(possivel_ocupacao[1]) in settings.indices_tabuleiro:
+        return True
+    return False
+
+def verificarSePeaoPodeAvancarUmaCasa(peca:PecaXadrez, tabuleiro_movimentos:list):
+    # representa o movimento do peão para 1 casa em sua frente
+    possivel_ocupacao_linha = peca.indice_linha_atual + peca.tipos_movimentos[0][0] 
+    possivel_ocupacao_coluna = peca.indice_coluna_atual + peca.tipos_movimentos[0][1]
+
+    if str(possivel_ocupacao_linha) in settings.indices_tabuleiro and settings.tabuleiro_principal[possivel_ocupacao_linha][peca.indice_coluna_atual].classe == "vazio":
+        settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
+        tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
+        return True
+    return False
+
+def verificarSePeaoPodeAvancarDuasCasas(peca:PecaXadrez, tabuleiro_movimentos:list):
+    # representa o movimento do peão para 2 casas em sua frente
+    possivel_ocupacao_linha = peca.indice_linha_atual + peca.tipos_movimentos[1][0]
+    possivel_ocupacao_coluna = peca.indice_coluna_atual + peca.tipos_movimentos[1][1]
+
+    posicao_inicial_peao = ["1", "6"]
+    if str(possivel_ocupacao_linha) in settings.indices_tabuleiro and str(peca.indice_linha_atual) in posicao_inicial_peao and settings.tabuleiro_principal[possivel_ocupacao_linha][peca.indice_coluna_atual].classe == "vazio":
+        settings.tabuleiro_principal[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
+        tabuleiro_movimentos[possivel_ocupacao_linha][possivel_ocupacao_coluna] = settings.movimento_possivel
+
+def verificarSeRoqueEhUmaOpcaoValida(peca:PecaXadrez, movimento:list, tabuleiro_movimentos:list):
+    roque_foi_encontrado = False
+    # Testa se o movimento sendo avaliado é o roque do rei (longo ou curto)
+    if peca.classe == "rei" and movimento == peca.tipos_movimentos[8] or peca.classe == "rei" and movimento == peca.tipos_movimentos[9]:
+        # Separa a lógica de teste entre roque curto (primeiro) e roque longo (segundo)
+        potencial_torre = pecas.descobrirPeca(peca.indice_linha_atual, 7)
+        if peca.classe == "rei" and movimento == peca.tipos_movimentos[8] and potencial_torre.classe == "torre":
+            # testa se as condições para o roque são válidas (rei e torre não terem se movido e espaço livre entre as peças)
+            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(peca.indice_linha_atual, 6).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 5).classe == "vazio":
+                # se o roque for válido, adiciona essa opção de movimento para o usuário
+                settings.tabuleiro_principal[peca.indice_linha_atual][peca.indice_coluna_atual+2] = settings.movimento_possivel
+                tabuleiro_movimentos[peca.indice_linha_atual][peca.indice_coluna_atual+2] = settings.movimento_possivel
+                roque_foi_encontrado = True
+        potencial_torre = pecas.descobrirPeca(peca.indice_linha_atual, 0)
+        if peca.classe == "rei" and movimento == peca.tipos_movimentos[9] and potencial_torre.classe == "torre":
+            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(peca.indice_linha_atual, 1).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 2).aparencia == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 3).aparencia == "vazio":
+                settings.tabuleiro_principal[peca.indice_linha_atual][peca.indice_coluna_atual-2] = settings.movimento_possivel
+                tabuleiro_movimentos[peca.indice_linha_atual][peca.indice_coluna_atual+2] = settings.movimento_possivel
+                roque_foi_encontrado = True
+    return roque_foi_encontrado
+
+def verificarSeNovaPosicaoEstaLivre(possivel_ocupacao:Cordenadas, tabuleiro_movimentos:list):
+    if pecas.descobrirPeca(possivel_ocupacao.indice_linha, possivel_ocupacao.indice_coluna).classe == "vazio":
+        settings.tabuleiro_principal[possivel_ocupacao.indice_linha][possivel_ocupacao.indice_coluna] = settings.movimento_possivel
+        tabuleiro_movimentos[possivel_ocupacao.indice_linha][possivel_ocupacao.indice_coluna] = settings.movimento_possivel
+
+def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao:Cordenadas, tabuleiro_movimentos:list):
+    posicao_analizada = pecas.descobrirPeca(possivel_ocupacao.indice_linha, possivel_ocupacao.indice_coluna)
+    # Testar depois se 'posicao_analizada.aparencia != ""' é realmente necessário
+    if posicao_analizada.aparencia in settings.pecas_jogador_de_pretas and posicao_analizada.aparencia != "" and settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS.value or posicao_analizada.aparencia in settings.pecas_jogador_de_brancas and posicao_analizada.aparencia != "" and settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS.value:
+        tabuleiro_movimentos[possivel_ocupacao.indice_linha][possivel_ocupacao.indice_coluna] = settings.movimento_possivel
+        return True
+    return False
+
+
+def executarMovimento(peca:PecaXadrez, nova_cordenada:list):
+    executarAcoesEspecificasMovimentoEnPassant(peca, nova_cordenada)
     limparPassantsPossiveis(settings.tabuleiro_principal)
+    executarAcoesEspecificasMovimentoPermitaNovoEnPassant(peca, nova_cordenada)
+    executarAcoesEspecificasMovimentoPromocaoPeao(peca, nova_cordenada)
+    executarAcoesEspecificasMovimentoRoque(peca, nova_cordenada)
 
-    #execução caso en passant seja possivel
-    if n_pos1 - pos1 == 2 and peca.aparencia == "♙" or n_pos1 - pos1 == -2 and peca.aparencia == "♟":
-        if n_pos1 - pos1 == 2 and n_pos2-1 >= 0:
-            if pecas.descobrirPeca(n_pos1, n_pos2-1).aparencia == "♟":
-                pecas.descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
-        if n_pos1 - pos1 == 2 and n_pos2+1 < 8:
-            if pecas.descobrirPeca(n_pos1, n_pos2+1).aparencia == "♟":
-                pecas.descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
-        if n_pos1 - pos1 == -2 and n_pos2-1 >= 0:
-            if pecas.descobrirPeca(n_pos1, n_pos2-1).aparencia == "♙":
-                pecas.descobrirPeca(n_pos1, n_pos2-1).passant_direita = True
-        if n_pos1 - pos1 == -2 and n_pos2+1 < 8:
-            if pecas.descobrirPeca(n_pos1, n_pos2+1).aparencia == "♙":
-                pecas.descobrirPeca(n_pos1, n_pos2+1).passant_esquerda = True
+    executarAcoesGeraisParaQualquerMovimento(peca, nova_cordenada)
 
-    #execução caso o peão movido esteja na linha de promoção
-    if peca.aparencia == "♙" and n_pos1 == 7 or peca.aparencia == "♟" and n_pos1 == 0:
+def executarAcoesEspecificasMovimentoEnPassant(peca:PecaXadrez, nova_cordenada:list):
+    if peca.classe == "peao" and settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]].aparencia == "•" and nova_cordenada[1] != peca.indice_coluna_atual:
+        if settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS:
+            settings.tabuleiro_principal[nova_cordenada[0]+1][nova_cordenada[1]] = settings.espaco_vazio
+        else:
+            settings.tabuleiro_principal[nova_cordenada[0]-1][nova_cordenada[1]] = settings.espaco_vazio
+
+def executarAcoesEspecificasMovimentoPermitaNovoEnPassant(peca:PecaXadrez, nova_cordenada:list):
+    if nova_cordenada[0] - peca.indice_linha_atual == 2 and peca.aparencia == "♙" or nova_cordenada[0] - peca.indice_linha_atual == -2 and peca.aparencia == "♟":
+        if nova_cordenada[0] - peca.indice_linha_atual == 2 and nova_cordenada[1]-1 >= 0:
+            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).aparencia == "♟":
+                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).passant_direita = True
+        if nova_cordenada[0] - peca.indice_linha_atual == 2 and nova_cordenada[1]+1 < 8:
+            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).aparencia == "♟":
+                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).passant_esquerda = True
+        if nova_cordenada[0] - peca.indice_linha_atual == -2 and nova_cordenada[1]-1 >= 0:
+            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).aparencia == "♙":
+                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).passant_direita = True
+        if nova_cordenada[0] - peca.indice_linha_atual == -2 and nova_cordenada[1]+1 < 8:
+            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).aparencia == "♙":
+                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).passant_esquerda = True
+
+def executarAcoesEspecificasMovimentoPromocaoPeao(peca:PecaXadrez, nova_cordenada:list):
+    if peca.aparencia == "♙" and nova_cordenada[0] == 7 or peca.aparencia == "♟" and nova_cordenada[0] == 0:
         peca.promovido = True
 
-    #execução caso roque
-    elif n_pos2 - pos2 == 2 and peca.aparencia in "♔♚" and peca.se_moveu == False or n_pos2 - pos2 == -2 and peca.aparencia in "♔♚" and peca.se_moveu == False:
-        if n_pos2 < 4:
-            settings.tabuleiro_principal[n_pos1][n_pos2+1] = settings.tabuleiro_principal[n_pos1][n_pos2-2]
-            settings.tabuleiro_principal[n_pos1][n_pos2-2] = settings.espaco_vazio
+def executarAcoesEspecificasMovimentoRoque(peca:PecaXadrez, nova_cordenada:list):
+    if nova_cordenada[1] - peca.indice_coluna_atual == 2 and peca.classe == "rei" and peca.se_moveu == False or nova_cordenada[1] - peca.indice_coluna_atual == -2 and peca.classe in "rei" and peca.se_moveu == False:
+        if nova_cordenada[1] < 4:
+            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]+1] = settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]-2]
+            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]-2] = settings.espaco_vazio
         else:
-            settings.tabuleiro_principal[n_pos1][n_pos2-1] = settings.tabuleiro_principal[n_pos1][n_pos2+1]
-            settings.tabuleiro_principal[n_pos1][n_pos2+1] = settings.espaco_vazio
-            
+            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]-1] = settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]+1]
+            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]+1] = settings.espaco_vazio
 
-    #execução padrão e geral do movimento
+def executarAcoesGeraisParaQualquerMovimento(peca:PecaXadrez, nova_cordenada:list):
     peca.se_moveu = True
-    settings.tabuleiro_principal[n_pos1][n_pos2] = peca
-    settings.tabuleiro_principal[pos1][pos2] = settings.espaco_vazio
+    settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]] = peca
+    settings.tabuleiro_principal[peca.indice_linha_atual][peca.indice_coluna_atual] = settings.espaco_vazio
 
 def limparMovimentosPossiveis(tabuleiro):
     for linha in range(8):
@@ -128,6 +196,6 @@ def limparMovimentosPossiveis(tabuleiro):
 def limparPassantsPossiveis(tabuleiro):
     for linha in range(8):
         for coluna in range(8):
-            if tabuleiro[linha][coluna].aparencia in "♟♙":
+            if tabuleiro[linha][coluna].classe == "peao":
                 tabuleiro[linha][coluna].passant_direita = False
                 tabuleiro[linha][coluna].passant_esquerda = False

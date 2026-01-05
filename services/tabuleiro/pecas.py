@@ -9,7 +9,7 @@ def descobrirPeca(cordenadas:Cordenadas):
 
 def atualizarPosicaoPeca(cordenadas:Cordenadas):
     peca = settings.tabuleiro_principal[cordenadas.indice_linha][cordenadas.indice_coluna]
-    
+
     if peca.aparencia in settings.pecas_jogador_de_brancas or peca.aparencia in settings.pecas_jogador_de_pretas:
         peca.indice_linha_atual = cordenadas.indice_linha
         peca.indice_coluna_atual = cordenadas.indice_coluna
@@ -18,12 +18,12 @@ def promoverPeao(peca:PecaXadrez):
     impressoes.imprimirCabecalho("PROMOÇÃO DE PEÃO")
     tabuleiros.imprimirTabuleiro(settings.tabuleiro_principal)
     impressoes.imprimirDivisoria()
-    print("Que aventura em.. deseja trocar seu peão por qual peça?\nVocê pode escolher entre 'cavalo', 'torre', 'bispo', e 'rainha'")
+    print("Que aventura em.. deseja promover seu peão para qual peça?\nVocê pode escolher entre 'cavalo', 'torre', 'bispo', e 'rainha'")
     
     peca = selecionarPromocaoDoPeao(peca)
 
     impressoes.imprimirDivisoria()
-    print(f"{peca.aparencia} - Seu peão foi promovido!!")
+    print(f"{peca.aparencia} - Seu peão foi promovido para {peca.classe}!!")
     impressoes.imprimirDivisoria()
 
 def selecionarPromocaoDoPeao(peca:PecaXadrez):
