@@ -131,7 +131,7 @@ def verificarSeNovaPosicaoEstaLivre(possivel_ocupacao:Cordenadas, tabuleiro_movi
 
 def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao:Cordenadas, tabuleiro_movimentos:list):
     posicao_analizada = pecas.descobrirPeca(possivel_ocupacao.indice_linha, possivel_ocupacao.indice_coluna)
-    # Testar depois se 'posicao_analizada.aparencia != ""' é realmente necessário
+    # TODO: depois checar se 'posicao_analizada.aparencia != ""' é realmente necessário
     if posicao_analizada.aparencia in settings.pecas_jogador_de_pretas and posicao_analizada.aparencia != "" and settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS.value or posicao_analizada.aparencia in settings.pecas_jogador_de_brancas and posicao_analizada.aparencia != "" and settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS.value:
         tabuleiro_movimentos[possivel_ocupacao.indice_linha][possivel_ocupacao.indice_coluna] = settings.movimento_possivel
         return True
@@ -139,8 +139,9 @@ def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao:Cordenada
 
 
 def executarMovimento(peca:PecaXadrez, nova_cordenada:list):
+    # TODO: uma função deve ser adicionada para atualizar a posição de uma peça após seu movimento
     executarAcoesEspecificasMovimentoEnPassant(peca, nova_cordenada)
-    limparPassantsPossiveis(settings.tabuleiro_principal)
+    tabuleiros.limparPassantsPossiveis(settings.tabuleiro_principal)
     executarAcoesEspecificasMovimentoPermitaNovoEnPassant(peca, nova_cordenada)
     executarAcoesEspecificasMovimentoPromocaoPeao(peca, nova_cordenada)
     executarAcoesEspecificasMovimentoRoque(peca, nova_cordenada)
@@ -186,16 +187,3 @@ def executarAcoesGeraisParaQualquerMovimento(peca:PecaXadrez, nova_cordenada:lis
     peca.se_moveu = True
     settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]] = peca
     settings.tabuleiro_principal[peca.indice_linha_atual][peca.indice_coluna_atual] = settings.espaco_vazio
-
-def limparMovimentosPossiveis(tabuleiro):
-    for linha in range(8):
-        for coluna in range(8):
-            if tabuleiro[linha][coluna].aparencia == "•":
-                tabuleiro[linha][coluna] = settings.espaco_vazio
-
-def limparPassantsPossiveis(tabuleiro):
-    for linha in range(8):
-        for coluna in range(8):
-            if tabuleiro[linha][coluna].classe == "peao":
-                tabuleiro[linha][coluna].passant_direita = False
-                tabuleiro[linha][coluna].passant_esquerda = False

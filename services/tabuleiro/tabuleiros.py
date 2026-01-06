@@ -44,3 +44,21 @@ def inverterOTabuleiroSeJogadorDePretas(tabuleiro_impressao:list):
         tabuleiro_impressao[linha] = settings.tabuleiro_principal[linha_contraria]
         linha_contraria-=1
     return tabuleiro_impressao, numeros_tabuleiro_invertidos
+
+def percorrerCadaCasaDoTabuleiro():
+    for linha in range(8):
+        for coluna in range(8):
+            yield linha, coluna
+
+def limparMovimentosPossiveis(tabuleiro:list):
+    for linha in range(8):
+        for coluna in range(8):
+            if tabuleiro[linha][coluna].aparencia == "•":
+                tabuleiro[linha][coluna] = settings.espaco_vazio
+
+def limparPassantsPossiveis(tabuleiro:list):
+    for linha in range(8):
+        for coluna in range(8):
+            if tabuleiro[linha][coluna].classe == "peao":
+                tabuleiro[linha][coluna].passant_direita = False
+                tabuleiro[linha][coluna].passant_esquerda = False

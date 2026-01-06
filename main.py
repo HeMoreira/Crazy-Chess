@@ -1,4 +1,5 @@
 from services.utilitarios import iniciar_partida
+from services.tabuleiro.tabuleiros import percorrerCadaCasaDoTabuleiro
 
 entrada = "entrada invalida"
 while True:

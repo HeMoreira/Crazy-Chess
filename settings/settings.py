@@ -29,6 +29,8 @@ espacos_vazios = {
     "espaco vazio":" ",
     "movimento possivel":"•"
 }
+cordenadas_do_rei_preto = [0, 4]
+cordenadas_do_rei_branco = [7, 4]
 
 conversao_coluna = {"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8}
 numeros_tabuleiro = ("8","7","6","5","4","3","2","1")
