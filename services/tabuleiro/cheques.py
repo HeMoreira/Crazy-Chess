@@ -1,57 +1,55 @@
 from settings import settings
-from services.tabuleiro import movimentos, pecas, tabuleiros
-from models.enums_utilitarios import Jogador
+from services.tabuleiro import tabuleiros, pecas, movimentos
+from models.cords import Cordenadas
+from models.enums_utilitarios import StatusDePartida
+from services.utilitarios import condicionais_abreviadas as conds
 import copy
 
-def testarChequeParaJogadorAtual():
-    for linha, coluna in tabuleiros.percorrerCadaCasaDoTabuleiro():
-        peca = pecas.descobrirPeca(linha, coluna)
-        if settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS.value and peca.aparencia in settings.pecas_jogador_de_pretas or settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS.value and peca.aparencia in settings.pecas_jogador_de_brancas:
-            tabuleiro_movimentos = movimentos.descobrirMovimentosValidos(peca)
-            # TODO: Essa alteração melhora e muito a performance do jogo. Porém, para funcionar, a posição do rei deverá ser atualizada em settings sempre que ele se move.
-            if tabuleiro_movimentos[settings.cordenadas_do_rei_branco[0]][settings.cordenadas_do_rei_branco[1]] == "•" and settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS.value or tabuleiro_movimentos[settings.cordenadas_do_rei_preto[0]][settings.cordenadas_do_rei_preto[1]] == "•" and settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS.value:
-                tabuleiros.limparMovimentosPossiveis(settings.tabuleiro_principal)
-                return True
-    tabuleiros.limparMovimentosPossiveis(settings.tabuleiro_principal)
-    return False
 
 def testarSeFimDeJogoParaJogadorAtual():
     if testarChequeParaJogadorAtual() == True:
         if testarChequeMateParaJogadorAtual() == True:
-            return "MATE"
+            return StatusDePartida.CHEQUE_MATE
         else:
-            return "CHEQUE"
+            return StatusDePartida.CHEQUE
     elif testarAfogamentoParaJogadorAtual() == True:
-        return "AFOGAMENTO"
+        return StatusDePartida.AFOGAMENTO
     
+def testarChequeParaJogadorAtual():
+    lista_de_movimentos_da_peca = []
+    for linha, coluna in tabuleiros.percorrerCadaCasaDoTabuleiro():
+        peca = pecas.descobrirPeca(Cordenadas(linha, coluna))
+        if conds.pecaEhDoJogadorOponente(peca):
+            lista_de_movimentos_da_peca = movimentos.descobrirMovimentosValidos(peca)
+            # TODO: Essa alteração melhora e muito a performance do jogo. Porém, para funcionar, a posição do rei deverá ser atualizada em settings sempre que ele se move.
+            for cordenadas in lista_de_movimentos_da_peca:
+                if conds.reiEstaAmeaçadoPorMovimento(peca, cordenadas):
+                    return True
+    return False
+
 def testarChequeMateParaJogadorAtual():
-    if testarSeChequeAposCadaJogadaPossivel() == True:
+    if verificarSeChequeAposCadaJogadaPossivel() == True:
         return True
     return False
 
 def testarAfogamentoParaJogadorAtual():
-    if testarSeChequeAposCadaJogadaPossivel() == True:
+    if verificarSeChequeAposCadaJogadaPossivel() == True:
         if testarChequeParaJogadorAtual() == False:
             return True
     return False
-        
 
-def testarTodasOsMovimentosPossiveisParaUmaJogada():
+def verificarSeChequeAposCadaJogadaPossivel():
+    lista_de_movimentos_da_peca = []
     for linha, coluna in tabuleiros.percorrerCadaCasaDoTabuleiro():
-        peca = pecas.descobrirPeca(linha, coluna)
-        if settings.jogador_atual == Jogador.JOGADOR_DE_PRETAS and peca.aparencia in settings.pecas_jogador_de_pretas or settings.jogador_atual == Jogador.JOGADOR_DE_BRANCAS and peca.aparencia in settings.pecas_jogador_de_brancas:
-            tabuleiro_movimentos = movimentos.descobrirMovimentosValidos(peca)
-            for linha2, coluna2 in tabuleiros.percorrerCadaCasaDoTabuleiro():
-                if tabuleiro_movimentos[linha2][coluna2].aparencia == "•":
-                    tabuleiros.limparMovimentosPossiveis(settings.tabuleiro_principal)
-                    tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
-                    movimentos.executarMovimento(peca, [linha2, coluna2])
-                    yield tabuleiro_suporte
-
-def testarSeChequeAposCadaJogadaPossivel():
-    for tabuleiro_suporte in testarTodasOsMovimentosPossiveisParaUmaJogada():
-        if testarChequeParaJogadorAtual() == False:
-            settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-            return False
-        settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+        peca = pecas.descobrirPeca(Cordenadas(linha, coluna))
+        if conds.pecaEhDoJogadorAtual(peca):
+            lista_de_movimentos_da_peca = movimentos.descobrirMovimentosValidos(peca)
+            for cordenadas in lista_de_movimentos_da_peca:
+                tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
+                movimentos.executarMovimento(peca, cordenadas)
+                if testarChequeParaJogadorAtual() == False:
+                    settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                    return False
+                settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
     return True
+

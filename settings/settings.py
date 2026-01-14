@@ -5,22 +5,8 @@ from models.enums_utilitarios import Jogador
 espaco_vazio = espacos_sem_pecas.espacoVazio()
 movimento_possivel = espacos_sem_pecas.movimentoPossivel()
 
-pecas_jogador_de_pretas = {
-    "rei":"♔",
-    "rainha":"♕",
-    "torre":"♖",
-    "bispo":"♗",
-    "cavalo":"♘",
-    "peao":"♙"
-}
-pecas_jogador_de_brancas = {
-    "rei":"♚",
-    "rainha":"♛",
-    "torre":"♜",
-    "bispo":"♝",
-    "cavalo":"♞",
-    "peao":"♟"
-}
+pecas_jogador_de_pretas = ["♔", "♕", "♖", "♗", "♘", "♙"]
+pecas_jogador_de_brancas = ["♚", "♛", "♜", "♝", "♞", "♟"]
 pecas_jogadores = [
     pecas_jogador_de_brancas,
     pecas_jogador_de_pretas
@@ -38,6 +24,7 @@ indices_tabuleiro = ("0","1","2","3","4","5","6","7")
 
 jogador_atual = Jogador.JOGADOR_DE_BRANCAS
 partida_esta_acontecendo = True
+rodada_finalizada_com_sucesso = False
 
 tabuleiro_principal = [
     [peca.Torre(False, "♖"), peca.Cavalo(False, "♘"), peca.Bispo(False, "♗"), peca.Rainha(False, "♕"), 
