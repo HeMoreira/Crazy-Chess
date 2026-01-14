@@ -45,4 +45,4 @@ tabuleiro_principal = [
      peca.Rei(True, "♚", 7, 4), peca.Bispo(True, "♝", 7, 5), peca.Cavalo(True, "♞", 7, 6), peca.Torre(True, "♜", 7, 7)]
 ]
 
-inversao_dinamica_esta_habilitada = True
+inversao_dinamica_esta_habilitada = False
