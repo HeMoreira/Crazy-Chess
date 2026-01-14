@@ -45,7 +45,8 @@ def percorrerCadaCasaDoTabuleiro():
 
 def exibirMovimentosPossiveis(lista_de_cordenadas:list):
     for cordenada in lista_de_cordenadas:
-        settings.tabuleiro_principal[cordenada.indice_linha][cordenada.indice_coluna] = settings.movimento_possivel
+        if settings.tabuleiro_principal[cordenada.indice_linha][cordenada.indice_coluna].classe == "vazio":
+            settings.tabuleiro_principal[cordenada.indice_linha][cordenada.indice_coluna] = settings.movimento_possivel
 
 def limparMovimentosPossiveis():
     for linha, coluna in percorrerCadaCasaDoTabuleiro():

@@ -30,8 +30,9 @@ def descobrirMovimentosValidosParaPecaTipoInfinito(peca:PecaXadrez):
         
             if verificarSePossivelOcupacaoEhValida(possivel_ocupacao) == False:
                 break
-
             lista_movimentos_peca.append(possivel_ocupacao)
+            if verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao) == True:
+                break
     return lista_movimentos_peca
 
 def descobrirMovimentosValidosParaPecaTipoUnico(peca:PecaXadrez):

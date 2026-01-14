@@ -133,6 +133,7 @@ def desfazerMovimento(tabuleiro_suporte:list):
 
 def confirmarJogada(tabuleiro_suporte:list):
     if pedirConfirmacaoDaJogada() == True:
+        tabuleiros.limparMovimentosPossiveis()
         settings.rodada_finalizada_com_sucesso = True
         return True
     else:
@@ -148,6 +149,5 @@ def pedirConfirmacaoDaJogada():
         confirmacao = input("Confirme o movimento pressionando enter.\nRetroceda digitando 'cancelar'\nResposta: ")
     if confirmacao.lower() == "cancelar":
         print("Refazendo movimento...")
-        tabuleiros.limparMovimentosPossiveis()
         return False
     return True
