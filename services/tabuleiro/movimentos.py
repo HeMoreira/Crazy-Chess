@@ -85,14 +85,14 @@ def verificarSeRoqueEhUmaOpcaoValida(peca:PecaXadrez, movimento:list):
     # Testa se o movimento sendo avaliado é o roque do rei (longo ou curto)
     if peca.classe == "rei" and movimento == peca.tipos_movimentos[8] or peca.classe == "rei" and movimento == peca.tipos_movimentos[9]:
         # Separa a lógica de teste entre roque curto (primeiro) e roque longo (segundo)
-        potencial_torre = pecas.descobrirPeca(peca.indice_linha_atual, 7)
+        potencial_torre = pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 7))
         if peca.classe == "rei" and movimento == peca.tipos_movimentos[8] and potencial_torre.classe == "torre":
             # testa se as condições para o roque são válidas (rei e torre não terem se movido e espaço livre entre as peças)
-            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(peca.indice_linha_atual, 6).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 5).classe == "vazio":
+            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 6)).classe == "vazio" and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 5)).classe == "vazio":
                 return True
-        potencial_torre = pecas.descobrirPeca(peca.indice_linha_atual, 0)
+        potencial_torre = pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 0))
         if peca.classe == "rei" and movimento == peca.tipos_movimentos[9] and potencial_torre.classe == "torre":
-            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(peca.indice_linha_atual, 1).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 2).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 3).classe == "vazio":
+            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 1)).classe == "vazio" and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 2)).classe == "vazio" and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 3)).classe == "vazio":
                 return True
     return False
 
@@ -162,8 +162,9 @@ def verificarSePeaoPodeCapturarEnPassant(peca:PecaXadrez, i:int):
     return False
 
 def executarMovimento(peca:PecaXadrez, nova_cordenada:Cordenadas):
+    
     executarAcoesEspecificasCasoMovimentoSejaEnPassant(peca, nova_cordenada)
-    tabuleiros.limparPassantsPossiveis(settings.tabuleiro_principal)
+    tabuleiros.limparPassantsPossiveis()
     executarAcoesEspecificasCasoMovimentoPermitaNovoEnPassant(peca, nova_cordenada)
     executarAcoesEspecificasCasoMovimentoPromocaoPeao(peca, nova_cordenada)
     executarAcoesEspecificasCasoMovimentoRoque(peca, nova_cordenada)

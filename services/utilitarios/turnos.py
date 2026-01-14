@@ -115,7 +115,7 @@ def responderAMovimentacaoDePecaDoJogadorAtual(entrada_do_jogador:list[Cordenada
 
     tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
     movimentos.executarMovimento(peca, novas_cordenadas)
-    tabuleiros.limparMovimentosPossiveis(settings.tabuleiro_principal)
+    tabuleiros.limparMovimentosPossiveis()
 
     if movimentos.testarSeMovimentoResultaEmCheque() == True:
         desfazerMovimento(tabuleiro_suporte)
@@ -129,7 +129,7 @@ def responderAMovimentacaoDePecaDoJogadorAtual(entrada_do_jogador:list[Cordenada
 def desfazerMovimento(tabuleiro_suporte:list):
     settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
     settings.rodada_finalizada_com_sucesso = False
-    movimentos.limparMovimentosPossiveis(settings.tabuleiro_principal)
+    movimentos.limparMovimentosPossiveis()
 
 def confirmarJogada(tabuleiro_suporte:list):
     if pedirConfirmacaoDaJogada() == True:
@@ -139,7 +139,7 @@ def confirmarJogada(tabuleiro_suporte:list):
         print("Refazendo movimento...")
         settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
         settings.rodada_finalizada_com_sucesso = False
-        movimentos.limparMovimentosPossiveis(settings.tabuleiro_principal)
+        movimentos.limparMovimentosPossiveis()
         return False
     
 def pedirConfirmacaoDaJogada():
@@ -148,6 +148,6 @@ def pedirConfirmacaoDaJogada():
         confirmacao = input("Confirme o movimento pressionando enter.\nRetroceda digitando 'cancelar'\nResposta: ")
     if confirmacao.lower() == "cancelar":
         print("Refazendo movimento...")
-        movimentos.limparMovimentosPossiveis(settings.tabuleiro_principal)
+        movimentos.limparMovimentosPossiveis()
         return False
     return True

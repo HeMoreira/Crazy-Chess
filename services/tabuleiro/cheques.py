@@ -44,12 +44,17 @@ def verificarSeChequeAposCadaJogadaPossivel():
         peca = pecas.descobrirPeca(Cordenadas(linha, coluna))
         if conds.pecaEhDoJogadorAtual(peca):
             lista_de_movimentos_da_peca = movimentos.descobrirMovimentosValidos(peca)
+            print("peca: ", peca.aparencia)
+            tabuleiros.exibirMovimentosPossiveis(lista_de_movimentos_da_peca)
+            tabuleiros.imprimirTabuleiro()
+            tabuleiros.limparMovimentosPossiveis()
             for cordenadas in lista_de_movimentos_da_peca:
                 tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
                 movimentos.executarMovimento(peca, cordenadas)
                 if testarChequeParaJogadorAtual() == False:
                     settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-                    return False
+                    # return False
                 settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-    return True
+    # return True
+    return False
 
