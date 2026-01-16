@@ -1,6 +1,8 @@
 import copy
 from settings import settings
 from models.enums_utilitarios import Jogador
+from models.peca_xadrez import PecaXadrez
+from models.cords import Cordenadas
 
 
 def imprimirTabuleiro(): 
@@ -58,3 +60,8 @@ def limparPassantsPossiveis():
         if settings.tabuleiro_principal[linha][coluna].classe == "peao":
             settings.tabuleiro_principal[linha][coluna].passant_direita = False
             settings.tabuleiro_principal[linha][coluna].passant_esquerda = False
+
+def restaurarPosicaoInicialDoTabuleiro(tabuleiro_suporte:list, peca:PecaXadrez, cordenadas_antigas:Cordenadas):
+    settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+    peca.indice_linha_atual = cordenadas_antigas.indice_linha
+    peca.indice_coluna_atual = cordenadas_antigas.indice_coluna

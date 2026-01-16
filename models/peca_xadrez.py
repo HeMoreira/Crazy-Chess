@@ -22,7 +22,7 @@ class Bispo(PecaXadrez):
         self.time = time
         self.aparencia = aparencia
         self.classe = "bispo"
-        self.tipos_movimentos = ((-1, -1), (1, 1), (1, -1), (1, 1))
+        self.tipos_movimentos = ((-1, -1), (1, 1), (1, -1), (-1, 1))
         self.tipo_de_movimento = TipoDeMovimento.INFINITO
         self.indice_linha_atual = indice_linha_atual
         self.indice_coluna_atual = indice_coluna_atual
