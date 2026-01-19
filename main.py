@@ -1,11 +1,5 @@
 from services.utilitarios import iniciar_partida
 
-from settings import settings
-import sys
-import io
-
-sys.stdin = io.StringIO(settings.respostas_teste)
-
 entrada = "entrada invalida"
 while True:
     entrada = input("Digite o número da ação que deseja\n1. Jogar partida de xadrez\n2. Sair do jogo\nResposta: ")
