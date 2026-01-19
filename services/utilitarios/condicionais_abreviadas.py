@@ -26,6 +26,5 @@ def jogadorAtualEhDePretas():
 
 def reiEstaAmeaçadoPorMovimento(peca:PecaXadrez, cordenadas_movimento_possivel:Cordenadas):
     if settings.tabuleiro_principal[cordenadas_movimento_possivel.indice_linha][cordenadas_movimento_possivel.indice_coluna].classe == "rei" and pecaEhDoJogadorOponente(peca):
-        print(f"    classe da peça do movimento possível {settings.tabuleiro_principal[cordenadas_movimento_possivel.indice_linha][cordenadas_movimento_possivel.indice_coluna].classe} e peca é do oponente: {pecaEhDoJogadorOponente(peca)}")
         return True
     return False

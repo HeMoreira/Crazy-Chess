@@ -15,7 +15,7 @@ def promoverPeaoSeEmCasaDePromocao(peca:PecaXadrez):
 
 def promoverPeao(peca:PecaXadrez):
     impressoes.imprimirCabecalho("PROMOÇÃO DE PEÃO")
-    tabuleiros.imprimirTabuleiro(settings.tabuleiro_principal)
+    tabuleiros.imprimirTabuleiro()
     impressoes.imprimirDivisoria()
     print("Que aventura em.. deseja promover seu peão para qual peça?\nVocê pode escolher entre 'cavalo', 'torre', 'bispo', e 'rainha'")
     
@@ -37,11 +37,11 @@ def selecionarPromocaoDoPeao(peca:PecaXadrez):
 def promoverPeaoPara(peao:PecaXadrez, nova_peca:str):
     match nova_peca:
         case "cavalo":
-            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Cavalo(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca], peao.indice_linha_atual, peao.indice_coluna_atual)
+            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Cavalo(peao.time, settings.pecas_jogadores[peao.time][4], peao.indice_linha_atual, peao.indice_coluna_atual)
         case "torre":
-            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Torre(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca], peao.indice_linha_atual, peao.indice_coluna_atual)
+            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Torre(peao.time, settings.pecas_jogadores[peao.time][2], peao.indice_linha_atual, peao.indice_coluna_atual)
         case "bispo":
-            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Bispo(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca], peao.indice_linha_atual, peao.indice_coluna_atual)
+            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Bispo(peao.time, settings.pecas_jogadores[peao.time][3], peao.indice_linha_atual, peao.indice_coluna_atual)
         case "rainha":
-            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Rainha(settings.jogador_atual, settings.pecas_jogadores[settings.jogador_atual][nova_peca], peao.indice_linha_atual, peao.indice_coluna_atual)
+            settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual] = settings.peca.Rainha(peao.time, settings.pecas_jogadores[peao.time][1], peao.indice_linha_atual, peao.indice_coluna_atual)
     return settings.tabuleiro_principal[peao.indice_linha_atual][peao.indice_coluna_atual]

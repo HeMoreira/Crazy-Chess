@@ -31,7 +31,7 @@ def descobrirMovimentosValidosParaPecaTipoInfinito(peca:PecaXadrez):
             if verificarSePossivelOcupacaoEhValida(peca, possivel_ocupacao) == False:
                 break
             lista_movimentos_peca.append(possivel_ocupacao)
-            if verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao) == True:
+            if verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(peca, possivel_ocupacao) == True:
                 break
     return lista_movimentos_peca
 
@@ -57,7 +57,7 @@ def verificarSePossivelOcupacaoEhValida(peca:PecaXadrez, possivel_ocupacao:Corde
     if verificarSeNovaPosicaoEstaNoTabuleiro(possivel_ocupacao) == True:
         # Este caso representa a ação de descobrir movimentos para a seleção de uma peça na rodada do jogador atual
         if conds.pecaEhDoJogadorAtual(peca) == True:
-            if verificarSeNovaPosicaoEstaLivre(possivel_ocupacao) or verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao):
+            if verificarSeNovaPosicaoEstaLivre(possivel_ocupacao) or verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(peca, possivel_ocupacao):
                 return True
         # Este caso representa a ação de descobrir movimentos na hora de avaliar se o rei do jogador atual está em cheque
         elif conds.pecaEhDoJogadorOponente(peca) == True:
@@ -71,10 +71,16 @@ def verificarSeNovaPosicaoEstaNoTabuleiro(possivel_ocupacao:Cordenadas):
         return True
     return False
 
-def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao:Cordenadas):
+def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(peca:PecaXadrez, possivel_ocupacao:Cordenadas):
     peca_na_posicao_analizada = pecas.descobrirPeca(possivel_ocupacao)
-    if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
-        return True
+    # Este caso representa a ação de descobrir movimentos para a seleção de uma peça na rodada do jogador atual
+    if conds.pecaEhDoJogadorAtual(peca):
+        if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
+            return True
+    # Este caso representa a ação de descobrir movimentos na hora de avaliar se o rei do jogador atual está em cheque
+    elif conds.pecaEhDoJogadorOponente(peca):
+        if conds.pecaEhDoJogadorAtual(peca_na_posicao_analizada):
+            return True
     return False
 
 def verificarSeNovaPosicaoEstaOcupadaPeloSeuTime(possivel_ocupacao:Cordenadas):
@@ -132,7 +138,7 @@ def descobrirMovimentosValidosParaPecaTipoPeao(peca:PecaXadrez):
         if verificarSePeaoPodeAvançarEmDiagonal(possivel_ocupacao) == False:
             continue
         else:
-            if verificarSePeaoPodeCapturarEmDiagonal(possivel_ocupacao) == False:
+            if verificarSePeaoPodeCapturarEmDiagonal(peca, possivel_ocupacao) == False:
                 continue
         lista_movimentos_peca.append(Cordenadas(possivel_ocupacao_linha, possivel_ocupacao_coluna))
     return lista_movimentos_peca
@@ -164,10 +170,16 @@ def verificarSePeaoPodeAvançarEmDiagonal(possivel_ocupacao:Cordenadas):
         return True
     return False
 
-def verificarSePeaoPodeCapturarEmDiagonal(possivel_ocupacao:Cordenadas):
+def verificarSePeaoPodeCapturarEmDiagonal(peca:PecaXadrez, possivel_ocupacao:Cordenadas):
     peca_na_posicao_analizada = pecas.descobrirPeca(possivel_ocupacao)
-    if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
-        return True
+    # Este caso representa a ação de descobrir movimentos para a seleção de uma peça na rodada do jogador atual
+    if conds.pecaEhDoJogadorAtual(peca):
+        if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
+            return True
+    # Este caso representa a ação de descobrir movimentos na hora de avaliar se o rei do jogador atual está em cheque
+    elif conds.pecaEhDoJogadorOponente(peca):
+        if conds.pecaEhDoJogadorAtual(peca_na_posicao_analizada):
+            return True
     return False
 
 def verificarSePeaoPodeCapturarEnPassant(peca:PecaXadrez, i:int):
