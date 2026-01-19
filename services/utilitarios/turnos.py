@@ -8,8 +8,9 @@ import copy
 
 def executarTurnoAtual():
     impressoes.imprimirDeQuemEhAVezDeJogar()
-    tabuleiros.imprimirTabuleiro()
+    tabuleiros.limparMovimentosPossiveis()
     status_da_partida = checarStatusDaPartidaParaTurnoAtual()
+    tabuleiros.imprimirTabuleiro()
     if status_da_partida == StatusDePartida.CHEQUE_MATE or status_da_partida == StatusDePartida.AFOGAMENTO:
         return
     entrada_inicial_do_jogador, tipo_de_entrada = obterSelecaoDePecaDoJogadorAtual()
@@ -92,13 +93,13 @@ def responderAPedidoDeEmpateDoJogadorAtual():
         fim_de_jogo.fimDeJogo(StatusDePartida.EMPATE_ACEITO)
     else:
         impressoes.imprimirCabecalhoComSubtitulo("O pedido de EMPATE foi NEGADO!", "Alguém está confiante... E a partida continua!!")
+        settings.rodada_finalizada_com_sucesso = False
 
 def responderASelecaoDePecaDoJogadorAtual(entrada_do_jogador:list[Cordenadas]):
     cordenadas = entrada_do_jogador[0]
     peca = pecas.descobrirPeca(cordenadas)
     lista_de_movimentos = movimentos.descobrirMovimentosValidos(peca)
     tabuleiros.exibirMovimentosPossiveis(lista_de_movimentos)
-    tabuleiros.imprimirTabuleiro()
     novas_cordenadas = obterNovaPosicaoDaPecaDoJogadorAtual(cordenadas)
     if novas_cordenadas == None:
         return
@@ -111,11 +112,10 @@ def responderAMovimentacaoDePecaDoJogadorAtual(entrada_do_jogador:list[Cordenada
     cordenadas = entrada_do_jogador[0]
     novas_cordenadas = entrada_do_jogador[1]
     peca = pecas.descobrirPeca(cordenadas)
-    tabuleiros.imprimirTabuleiro()
 
     tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
     movimentos.executarMovimento(peca, novas_cordenadas)
-    tabuleiros.limparMovimentosPossiveis(settings.tabuleiro_principal)
+    tabuleiros.limparMovimentosPossiveis()
 
     if movimentos.testarSeMovimentoResultaEmCheque() == True:
         desfazerMovimento(tabuleiro_suporte)
@@ -129,7 +129,6 @@ def responderAMovimentacaoDePecaDoJogadorAtual(entrada_do_jogador:list[Cordenada
 def desfazerMovimento(tabuleiro_suporte:list):
     settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
     settings.rodada_finalizada_com_sucesso = False
-    movimentos.limparMovimentosPossiveis(settings.tabuleiro_principal)
 
 def confirmarJogada(tabuleiro_suporte:list):
     if pedirConfirmacaoDaJogada() == True:
@@ -137,9 +136,8 @@ def confirmarJogada(tabuleiro_suporte:list):
         return True
     else:
         print("Refazendo movimento...")
-        settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
-        settings.rodada_finalizada_com_sucesso = False
-        movimentos.limparMovimentosPossiveis(settings.tabuleiro_principal)
+        desfazerMovimento(tabuleiro_suporte)
+        tabuleiros.limparMovimentosPossiveis()
         return False
     
 def pedirConfirmacaoDaJogada():
@@ -148,6 +146,5 @@ def pedirConfirmacaoDaJogada():
         confirmacao = input("Confirme o movimento pressionando enter.\nRetroceda digitando 'cancelar'\nResposta: ")
     if confirmacao.lower() == "cancelar":
         print("Refazendo movimento...")
-        movimentos.limparMovimentosPossiveis(settings.tabuleiro_principal)
         return False
     return True

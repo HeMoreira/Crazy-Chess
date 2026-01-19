@@ -1,6 +1,8 @@
 import copy
 from settings import settings
 from models.enums_utilitarios import Jogador
+from models.peca_xadrez import PecaXadrez
+from models.cords import Cordenadas
 
 
 def imprimirTabuleiro(): 
@@ -18,15 +20,14 @@ def imprimirCampo(tabuleiro_impressao:list, numeros_tabuleiro:list[str]):
     linha_atual = 0 
     impressao_final = impressao_final + f"{numeros_tabuleiro[linha_atual]}" 
     linha_atual+=1 
-    for linha in range(len(tabuleiro_impressao)):
-        for coluna in range(8):
-            impressao_final = impressao_final + " |" + tabuleiro_impressao[linha][coluna].aparencia
-            if (coluna+1) % 8 == 0 and linha+1 != 8:
-                impressao_final = impressao_final + " |\n" 
-                impressao_final = impressao_final + f"{numeros_tabuleiro[linha_atual]}" 
-                linha_atual+=1 
-            elif (coluna+1) % 8 == 0:
-                impressao_final = impressao_final + " |" 
+    for linha, coluna in percorrerCadaCasaDoTabuleiro():
+        impressao_final = impressao_final + " |" + tabuleiro_impressao[linha][coluna].aparencia
+        if (coluna+1) % 8 == 0 and linha+1 != 8:
+            impressao_final = impressao_final + " |\n" 
+            impressao_final = impressao_final + f"{numeros_tabuleiro[linha_atual]}" 
+            linha_atual+=1 
+        elif (coluna+1) % 8 == 0:
+            impressao_final = impressao_final + " |" 
     print(impressao_final) 
     print("   ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯") 
     print("    a  b  c  d  e  f  g  h")
@@ -46,17 +47,21 @@ def percorrerCadaCasaDoTabuleiro():
 
 def exibirMovimentosPossiveis(lista_de_cordenadas:list):
     for cordenada in lista_de_cordenadas:
-        settings.tabuleiro_principal[cordenada.indice_linha][cordenada.indice_coluna] = settings.movimento_possivel
+        if settings.tabuleiro_principal[cordenada.indice_linha][cordenada.indice_coluna].classe == "vazio":
+            settings.tabuleiro_principal[cordenada.indice_linha][cordenada.indice_coluna] = settings.movimento_possivel
 
-def limparMovimentosPossiveis(tabuleiro:list):
-    for linha in range(8):
-        for coluna in range(8):
-            if tabuleiro[linha][coluna].aparencia == "•":
-                tabuleiro[linha][coluna] = settings.espaco_vazio
+def limparMovimentosPossiveis():
+    for linha, coluna in percorrerCadaCasaDoTabuleiro():
+        if settings.tabuleiro_principal[linha][coluna].aparencia == "•":
+            settings.tabuleiro_principal[linha][coluna] = settings.espaco_vazio
 
-def limparPassantsPossiveis(tabuleiro:list):
-    for linha in range(8):
-        for coluna in range(8):
-            if tabuleiro[linha][coluna].classe == "peao":
-                tabuleiro[linha][coluna].passant_direita = False
-                tabuleiro[linha][coluna].passant_esquerda = False
+def limparPassantsPossiveis():
+    for linha, coluna in percorrerCadaCasaDoTabuleiro():
+        if settings.tabuleiro_principal[linha][coluna].classe == "peao":
+            settings.tabuleiro_principal[linha][coluna].passant_direita = False
+            settings.tabuleiro_principal[linha][coluna].passant_esquerda = False
+
+def restaurarPosicaoInicialDoTabuleiro(tabuleiro_suporte:list, peca:PecaXadrez, cordenadas_antigas:Cordenadas):
+    settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+    peca.indice_linha_atual = cordenadas_antigas.indice_linha
+    peca.indice_coluna_atual = cordenadas_antigas.indice_coluna

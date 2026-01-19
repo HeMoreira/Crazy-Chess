@@ -16,12 +16,10 @@ def testarSeFimDeJogoParaJogadorAtual():
         return StatusDePartida.AFOGAMENTO
     
 def testarChequeParaJogadorAtual():
-    lista_de_movimentos_da_peca = []
     for linha, coluna in tabuleiros.percorrerCadaCasaDoTabuleiro():
         peca = pecas.descobrirPeca(Cordenadas(linha, coluna))
         if conds.pecaEhDoJogadorOponente(peca):
             lista_de_movimentos_da_peca = movimentos.descobrirMovimentosValidos(peca)
-            # TODO: Essa alteração melhora e muito a performance do jogo. Porém, para funcionar, a posição do rei deverá ser atualizada em settings sempre que ele se move.
             for cordenadas in lista_de_movimentos_da_peca:
                 if conds.reiEstaAmeaçadoPorMovimento(peca, cordenadas):
                     return True
@@ -39,7 +37,6 @@ def testarAfogamentoParaJogadorAtual():
     return False
 
 def verificarSeChequeAposCadaJogadaPossivel():
-    lista_de_movimentos_da_peca = []
     for linha, coluna in tabuleiros.percorrerCadaCasaDoTabuleiro():
         peca = pecas.descobrirPeca(Cordenadas(linha, coluna))
         if conds.pecaEhDoJogadorAtual(peca):
@@ -48,8 +45,8 @@ def verificarSeChequeAposCadaJogadaPossivel():
                 tabuleiro_suporte = copy.deepcopy(settings.tabuleiro_principal)
                 movimentos.executarMovimento(peca, cordenadas)
                 if testarChequeParaJogadorAtual() == False:
-                    settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                    tabuleiros.restaurarPosicaoInicialDoTabuleiro(tabuleiro_suporte, peca, Cordenadas(linha, coluna))
                     return False
-                settings.tabuleiro_principal = copy.deepcopy(tabuleiro_suporte)
+                tabuleiros.restaurarPosicaoInicialDoTabuleiro(tabuleiro_suporte, peca, Cordenadas(linha, coluna))
     return True
 

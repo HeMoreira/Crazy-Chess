@@ -25,6 +25,6 @@ def jogadorAtualEhDePretas():
     return False
 
 def reiEstaAmeaçadoPorMovimento(peca:PecaXadrez, cordenadas_movimento_possivel:Cordenadas):
-    if cordenadas_movimento_possivel.indice_linha == settings.cordenadas_do_rei_branco[0] and cordenadas_movimento_possivel.indice_coluna == settings.cordenadas_do_rei_branco[1] and peca.time == Jogador.JOGADOR_DE_PRETAS or cordenadas_movimento_possivel.indice_linha == settings.cordenadas_do_rei_preto[0] and cordenadas_movimento_possivel.indice_coluna == settings.cordenadas_do_rei_preto[1] and peca.time == Jogador.JOGADOR_DE_BRANCAS:
+    if settings.tabuleiro_principal[cordenadas_movimento_possivel.indice_linha][cordenadas_movimento_possivel.indice_coluna].classe == "rei" and pecaEhDoJogadorOponente(peca):
         return True
     return False

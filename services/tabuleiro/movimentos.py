@@ -28,10 +28,11 @@ def descobrirMovimentosValidosParaPecaTipoInfinito(peca:PecaXadrez):
             
             possivel_ocupacao = Cordenadas(possivel_ocupacao_linha, possivel_ocupacao_coluna)
         
-            if verificarSePossivelOcupacaoEhValida(possivel_ocupacao) == False:
-                continue
-
+            if verificarSePossivelOcupacaoEhValida(peca, possivel_ocupacao) == False:
+                break
             lista_movimentos_peca.append(possivel_ocupacao)
+            if verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(peca, possivel_ocupacao) == True:
+                break
     return lista_movimentos_peca
 
 def descobrirMovimentosValidosParaPecaTipoUnico(peca:PecaXadrez):
@@ -43,7 +44,7 @@ def descobrirMovimentosValidosParaPecaTipoUnico(peca:PecaXadrez):
         possivel_ocupacao_coluna = peca.indice_coluna_atual + deslocamento_coluna
         possivel_ocupacao = Cordenadas(possivel_ocupacao_linha, possivel_ocupacao_coluna)
         
-        if verificarSePossivelOcupacaoEhValida(possivel_ocupacao) == False:
+        if verificarSePossivelOcupacaoEhValida(peca, possivel_ocupacao) == False:
             continue
         if verificarSeRoquePrecisaSerAvaliado(peca, movimento) == True:
             if verificarSeRoqueEhUmaOpcaoValida(peca, movimento) == False:
@@ -52,10 +53,17 @@ def descobrirMovimentosValidosParaPecaTipoUnico(peca:PecaXadrez):
         lista_movimentos_peca.append(possivel_ocupacao)
     return lista_movimentos_peca
 
-def verificarSePossivelOcupacaoEhValida(possivel_ocupacao:Cordenadas):
+def verificarSePossivelOcupacaoEhValida(peca:PecaXadrez, possivel_ocupacao:Cordenadas):
     if verificarSeNovaPosicaoEstaNoTabuleiro(possivel_ocupacao) == True:
-        if verificarSeNovaPosicaoEstaLivre(possivel_ocupacao) or verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao):
-            return True
+        # Este caso representa a ação de descobrir movimentos para a seleção de uma peça na rodada do jogador atual
+        if conds.pecaEhDoJogadorAtual(peca) == True:
+            if verificarSeNovaPosicaoEstaLivre(possivel_ocupacao) or verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(peca, possivel_ocupacao):
+                return True
+        # Este caso representa a ação de descobrir movimentos na hora de avaliar se o rei do jogador atual está em cheque
+        elif conds.pecaEhDoJogadorOponente(peca) == True:
+            if verificarSeNovaPosicaoEstaLivre(possivel_ocupacao) or verificarSeNovaPosicaoEstaOcupadaPeloSeuTime(possivel_ocupacao):
+                return True
+
     return False
 
 def verificarSeNovaPosicaoEstaNoTabuleiro(possivel_ocupacao:Cordenadas):
@@ -63,9 +71,21 @@ def verificarSeNovaPosicaoEstaNoTabuleiro(possivel_ocupacao:Cordenadas):
         return True
     return False
 
-def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(possivel_ocupacao:Cordenadas):
+def verificarSeNovaPosicaoEstaOcupadaPeloTimeInimigo(peca:PecaXadrez, possivel_ocupacao:Cordenadas):
     peca_na_posicao_analizada = pecas.descobrirPeca(possivel_ocupacao)
-    if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
+    # Este caso representa a ação de descobrir movimentos para a seleção de uma peça na rodada do jogador atual
+    if conds.pecaEhDoJogadorAtual(peca):
+        if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
+            return True
+    # Este caso representa a ação de descobrir movimentos na hora de avaliar se o rei do jogador atual está em cheque
+    elif conds.pecaEhDoJogadorOponente(peca):
+        if conds.pecaEhDoJogadorAtual(peca_na_posicao_analizada):
+            return True
+    return False
+
+def verificarSeNovaPosicaoEstaOcupadaPeloSeuTime(possivel_ocupacao:Cordenadas):
+    peca_na_posicao_analizada = pecas.descobrirPeca(possivel_ocupacao)
+    if conds.pecaEhDoJogadorAtual(peca_na_posicao_analizada):
         return True
     return False
 
@@ -85,14 +105,14 @@ def verificarSeRoqueEhUmaOpcaoValida(peca:PecaXadrez, movimento:list):
     # Testa se o movimento sendo avaliado é o roque do rei (longo ou curto)
     if peca.classe == "rei" and movimento == peca.tipos_movimentos[8] or peca.classe == "rei" and movimento == peca.tipos_movimentos[9]:
         # Separa a lógica de teste entre roque curto (primeiro) e roque longo (segundo)
-        potencial_torre = pecas.descobrirPeca(peca.indice_linha_atual, 7)
+        potencial_torre = pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 7))
         if peca.classe == "rei" and movimento == peca.tipos_movimentos[8] and potencial_torre.classe == "torre":
             # testa se as condições para o roque são válidas (rei e torre não terem se movido e espaço livre entre as peças)
-            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(peca.indice_linha_atual, 6).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 5).classe == "vazio":
+            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 6)).classe == "vazio" and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 5)).classe == "vazio":
                 return True
-        potencial_torre = pecas.descobrirPeca(peca.indice_linha_atual, 0)
+        potencial_torre = pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 0))
         if peca.classe == "rei" and movimento == peca.tipos_movimentos[9] and potencial_torre.classe == "torre":
-            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(peca.indice_linha_atual, 1).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 2).classe == "vazio" and pecas.descobrirPeca(peca.indice_linha_atual, 3).classe == "vazio":
+            if peca.se_moveu == False and potencial_torre.se_moveu == False and potencial_torre.time == peca.time and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 1)).classe == "vazio" and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 2)).classe == "vazio" and pecas.descobrirPeca(Cordenadas(peca.indice_linha_atual, 3)).classe == "vazio":
                 return True
     return False
 
@@ -118,7 +138,7 @@ def descobrirMovimentosValidosParaPecaTipoPeao(peca:PecaXadrez):
         if verificarSePeaoPodeAvançarEmDiagonal(possivel_ocupacao) == False:
             continue
         else:
-            if verificarSePeaoPodeCapturarEmDiagonal(possivel_ocupacao) == False:
+            if verificarSePeaoPodeCapturarEmDiagonal(peca, possivel_ocupacao) == False:
                 continue
         lista_movimentos_peca.append(Cordenadas(possivel_ocupacao_linha, possivel_ocupacao_coluna))
     return lista_movimentos_peca
@@ -150,10 +170,16 @@ def verificarSePeaoPodeAvançarEmDiagonal(possivel_ocupacao:Cordenadas):
         return True
     return False
 
-def verificarSePeaoPodeCapturarEmDiagonal(possivel_ocupacao:Cordenadas):
+def verificarSePeaoPodeCapturarEmDiagonal(peca:PecaXadrez, possivel_ocupacao:Cordenadas):
     peca_na_posicao_analizada = pecas.descobrirPeca(possivel_ocupacao)
-    if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
-        return True
+    # Este caso representa a ação de descobrir movimentos para a seleção de uma peça na rodada do jogador atual
+    if conds.pecaEhDoJogadorAtual(peca):
+        if conds.pecaEhDoJogadorOponente(peca_na_posicao_analizada):
+            return True
+    # Este caso representa a ação de descobrir movimentos na hora de avaliar se o rei do jogador atual está em cheque
+    elif conds.pecaEhDoJogadorOponente(peca):
+        if conds.pecaEhDoJogadorAtual(peca_na_posicao_analizada):
+            return True
     return False
 
 def verificarSePeaoPodeCapturarEnPassant(peca:PecaXadrez, i:int):
@@ -162,8 +188,9 @@ def verificarSePeaoPodeCapturarEnPassant(peca:PecaXadrez, i:int):
     return False
 
 def executarMovimento(peca:PecaXadrez, nova_cordenada:Cordenadas):
+    
     executarAcoesEspecificasCasoMovimentoSejaEnPassant(peca, nova_cordenada)
-    tabuleiros.limparPassantsPossiveis(settings.tabuleiro_principal)
+    tabuleiros.limparPassantsPossiveis()
     executarAcoesEspecificasCasoMovimentoPermitaNovoEnPassant(peca, nova_cordenada)
     executarAcoesEspecificasCasoMovimentoPromocaoPeao(peca, nova_cordenada)
     executarAcoesEspecificasCasoMovimentoRoque(peca, nova_cordenada)
@@ -174,24 +201,24 @@ def executarAcoesEspecificasCasoMovimentoSejaEnPassant(peca:PecaXadrez, nova_cor
     if peca.classe == "peao" and nova_cordenada.indice_coluna != peca.indice_coluna_atual and pecas.descobrirPeca(nova_cordenada).classe == "vazio":
         # remover o peão inimigo que foi capturado en passant
         if conds.jogadorAtualEhDeBrancas():
-            settings.tabuleiro_principal[nova_cordenada[0]+1][nova_cordenada[1]] = settings.espaco_vazio
+            settings.tabuleiro_principal[nova_cordenada.indice_linha+1][nova_cordenada.indice_coluna] = settings.espaco_vazio
         else:
-            settings.tabuleiro_principal[nova_cordenada[0]-1][nova_cordenada[1]] = settings.espaco_vazio
+            settings.tabuleiro_principal[nova_cordenada.indice_linha-1][nova_cordenada.indice_coluna] = settings.espaco_vazio
 
 def executarAcoesEspecificasCasoMovimentoPermitaNovoEnPassant(peca:PecaXadrez, nova_cordenada:Cordenadas):
     if nova_cordenada.indice_linha - peca.indice_linha_atual in [2, -2] and peca.classe == "peao":
         if nova_cordenada.indice_linha - peca.indice_linha_atual == 2 and nova_cordenada.indice_coluna-1 >= 0:
-            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).aparencia == "♟":
-                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).passant_direita = True
+            if pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna-1)).aparencia == "♟":
+                pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna-1)).passant_direita = True
         if nova_cordenada.indice_linha - peca.indice_linha_atual == 2 and nova_cordenada.indice_coluna+1 < 8:
-            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).aparencia == "♟":
-                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).passant_esquerda = True
+            if pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna+1)).aparencia == "♟":
+                pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna+1)).passant_esquerda = True
         if nova_cordenada.indice_linha - peca.indice_linha_atual == -2 and nova_cordenada.indice_coluna-1 >= 0:
-            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).aparencia == "♙":
-                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-1).passant_direita = True
+            if pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna-1)).aparencia == "♙":
+                pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna-1)).passant_direita = True
         if nova_cordenada.indice_linha - peca.indice_linha_atual == -2 and nova_cordenada.indice_coluna+1 < 8:
-            if pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).aparencia == "♙":
-                pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1).passant_esquerda = True
+            if pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna+1)).aparencia == "♙":
+                pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna+1)).passant_esquerda = True
 
 def executarAcoesEspecificasCasoMovimentoPromocaoPeao(peca:PecaXadrez, nova_cordenada:Cordenadas):
     if peca.aparencia == "♙" and nova_cordenada.indice_linha == 7 or peca.aparencia == "♟" and nova_cordenada.indice_linha == 0:
@@ -200,19 +227,19 @@ def executarAcoesEspecificasCasoMovimentoPromocaoPeao(peca:PecaXadrez, nova_cord
 def executarAcoesEspecificasCasoMovimentoRoque(peca:PecaXadrez, nova_cordenada:Cordenadas):
     if nova_cordenada.indice_coluna - peca.indice_coluna_atual in [2, -2] and peca.classe == "rei":
         if nova_cordenada.indice_coluna < 4:
-            torre = pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]-2)
-            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]+1] = torre
-            torre.indice_linha_atual = nova_cordenada[0]
-            torre.indice_coluna_atual = nova_cordenada[1]+1
+            torre = pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna-2))
+            settings.tabuleiro_principal[nova_cordenada.indice_linha][nova_cordenada.indice_coluna+1] = torre
+            torre.indice_linha_atual = nova_cordenada.indice_linha
+            torre.indice_coluna_atual = nova_cordenada.indice_coluna+1
 
-            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]-2] = settings.espaco_vazio
+            settings.tabuleiro_principal[nova_cordenada.indice_linha][nova_cordenada.indice_coluna-2] = settings.espaco_vazio
         else:
-            torre = pecas.descobrirPeca(nova_cordenada[0], nova_cordenada[1]+1)
-            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]-1] = torre
-            torre.indice_linha_atual = nova_cordenada[0]
-            torre.indice_coluna_atual = nova_cordenada[1]-1
-            
-            settings.tabuleiro_principal[nova_cordenada[0]][nova_cordenada[1]+1] = settings.espaco_vazio
+            torre = pecas.descobrirPeca(Cordenadas(nova_cordenada.indice_linha, nova_cordenada.indice_coluna+1))
+            settings.tabuleiro_principal[nova_cordenada.indice_linha][nova_cordenada.indice_coluna-1] = torre
+            torre.indice_linha_atual = nova_cordenada.indice_linha
+            torre.indice_coluna_atual = nova_cordenada.indice_coluna-1
+
+            settings.tabuleiro_principal[nova_cordenada.indice_linha][nova_cordenada.indice_coluna+1] = settings.espaco_vazio
 
 def executarAcoesGeraisParaQualquerMovimento(peca:PecaXadrez, nova_cordenada:Cordenadas):
     peca.se_moveu = True
@@ -220,11 +247,6 @@ def executarAcoesGeraisParaQualquerMovimento(peca:PecaXadrez, nova_cordenada:Cor
     settings.tabuleiro_principal[peca.indice_linha_atual][peca.indice_coluna_atual] = settings.espaco_vazio
     peca.indice_linha_atual = nova_cordenada.indice_linha
     peca.indice_coluna_atual = nova_cordenada.indice_coluna
-    if peca.classe == "rei":
-        if peca.time == Jogador.JOGADOR_DE_BRANCAS:
-            settings.cordenadas_do_rei_branco = [nova_cordenada.indice_linha, nova_cordenada.indice_coluna]
-        else:
-            settings.cordenadas_do_rei_preto = [nova_cordenada.indice_linha, nova_cordenada.indice_coluna]
 
 def testarSeMovimentoResultaEmCheque():
     if cheques.testarChequeParaJogadorAtual() == True:

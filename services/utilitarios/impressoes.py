@@ -11,7 +11,7 @@ def imprimirTituloIsolado(titulo:str):
     print(f"\n\n\n{titulo}\n")
 
 def introduzirPartida():
-    print("Que começem os Jogos..") 
+    print("\nQue começem os Jogos..") 
     imprimirCabecalho("PARTIDA PADRÃO DE XADREZ")
 
 def imprimirCabecalho(titulo:str):
